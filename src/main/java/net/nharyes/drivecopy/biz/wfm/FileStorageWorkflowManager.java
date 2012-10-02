@@ -20,7 +20,7 @@ import net.nharyes.drivecopy.biz.bo.FileBO;
 
 public interface FileStorageWorkflowManager extends WorkflowManager<FileBO> {
 
-	/**
+	/*
 	 * Workflow actions
 	 */
 	public static int ACTION_UPLOAD = 0;

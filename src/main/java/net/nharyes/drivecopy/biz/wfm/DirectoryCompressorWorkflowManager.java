@@ -20,7 +20,7 @@ import net.nharyes.drivecopy.biz.bo.DirectoryBO;
 
 public interface DirectoryCompressorWorkflowManager extends WorkflowManager<DirectoryBO> {
 
-	/**
+	/*
 	 * Workflow actions
 	 */
 	public static int ACTION_COMPRESS = 0;

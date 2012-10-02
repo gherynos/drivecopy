@@ -18,14 +18,34 @@ package net.nharyes.drivecopy.biz.bo;
 
 public class TokenBO implements BusinessObject {
 
+	private String clientId;
+
+	private String clientSecret;
+
 	private String accessToken;
 
 	private String refreshToken;
 
-	public TokenBO(String accessToken, String refreshToken) {
+	public TokenBO() {
 
+	}
+
+	public TokenBO(String clientId, String clientSecret, String accessToken, String refreshToken) {
+
+		this.clientId = clientId;
+		this.clientSecret = clientSecret;
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
+	}
+
+	public String getClientId() {
+
+		return clientId;
+	}
+
+	public String getClientSecret() {
+
+		return clientSecret;
 	}
 
 	public String getAccessToken() {

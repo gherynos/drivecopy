@@ -70,7 +70,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
 	private TokenBO getToken() throws WorkflowManagerException {
 
-		return tokenWorkflowManager.handleWorkflow(new TokenBO("", ""), TokenWorkflowManager.ACTION_GET);
+		return tokenWorkflowManager.handleWorkflow(new TokenBO(), TokenWorkflowManager.ACTION_GET);
 	}
 
 	private FileBO upload(FileBO file) throws WorkflowManagerException {

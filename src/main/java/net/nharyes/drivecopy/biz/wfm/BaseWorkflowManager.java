@@ -22,5 +22,8 @@ import net.nharyes.drivecopy.biz.bo.BusinessObject;
 
 public abstract class BaseWorkflowManager<B extends BusinessObject> implements WorkflowManager<B> {
 
+	/*
+	 * Logger
+	 */
 	protected final Logger logger = Logger.getLogger(getClass().getName());
 }

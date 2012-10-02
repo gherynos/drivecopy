@@ -20,7 +20,7 @@ import net.nharyes.drivecopy.biz.bo.TokenBO;
 
 public interface TokenWorkflowManager extends WorkflowManager<TokenBO> {
 
-	/**
+	/*
 	 * Workflow actions
 	 */
 	public static int ACTION_GET = 0;

@@ -35,7 +35,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<DirectoryBO> implements DirectoryCompressorWorkflowManager {
 
-	/**
+	/*
 	 * Constants
 	 */
 	private final int BUFFER = 2048;

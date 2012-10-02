@@ -16,33 +16,53 @@
 
 package net.nharyes.drivecopy.biz.wfm;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Properties;
+import java.io.InputStreamReader;
+import java.util.Arrays;
 
 import net.nharyes.drivecopy.biz.bo.TokenBO;
 import net.nharyes.drivecopy.biz.exc.WorkflowManagerException;
-import net.nharyes.drivecopy.srvc.TokenSdo;
-import net.nharyes.drivecopy.srvc.exc.SdoException;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.services.drive.DriveScopes;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class TokenWorkflowManagerImpl extends BaseWorkflowManager<TokenBO> implements TokenWorkflowManager {
 
-	// configuration file
-	private final String configFile = "drivecopy.properties";
+	/*
+	 * Constants
+	 */
+	private final String CLIENT_ID_KEY = "clientId";
+	private final String CLIENT_SECRET_KEY = "clientSecret";
+	private final String ACCESS_TOKEN_KEY = "accessToken";
+	private final String REFRESH_TOKEN_KEY = "refreshToken";
+	private final String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
 
-	// token SDO
-	private TokenSdo tokenSdo;
+	// configuration
+	private PropertiesConfiguration config;
+
+	// HTTP transport
+	private HttpTransport httpTransport;
+
+	// JSON factory
+	private JsonFactory jsonFactory;
 
 	@Inject
-	public TokenWorkflowManagerImpl(TokenSdo tokenSdo) {
+	public TokenWorkflowManagerImpl(PropertiesConfiguration config, HttpTransport httpTransport, JsonFactory jsonFactory) {
 
-		this.tokenSdo = tokenSdo;
+		this.config = config;
+		this.httpTransport = httpTransport;
+		this.jsonFactory = jsonFactory;
 	}
 
 	@Override
@@ -61,36 +81,52 @@ public class TokenWorkflowManagerImpl extends BaseWorkflowManager<TokenBO> imple
 
 		try {
 
-			// verify configuration file existence
-			File s = new File(configFile);
-			if (s.exists()) {
+			// check client ID and client secret configuration existence
+			if (!config.containsKey(CLIENT_ID_KEY) || !config.containsKey(CLIENT_SECRET_KEY)) {
 
-				// load settings
-				Properties sets = new Properties();
-				sets.load(new FileInputStream(s));
-				return new TokenBO(sets.getProperty("accessToken"), sets.getProperty("refreshToken"));
+				// request client data to user
+				System.out.println("Please insert CLIENT ID:");
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+				String clientId = br.readLine();
+				System.out.println("Please insert CLIENT SECRET:");
+				String clientSecret = br.readLine();
+
+				// store client data
+				config.setProperty(CLIENT_ID_KEY, clientId);
+				config.setProperty(CLIENT_SECRET_KEY, clientSecret);
+				config.save();
 			}
 
-			// request token
-			TokenBO tk = tokenSdo.requestToken();
+			// check tokens configuration existence
+			if (!config.containsKey(ACCESS_TOKEN_KEY) || !config.containsKey(REFRESH_TOKEN_KEY)) {
 
-			// store token into properties
-			Properties sets = new Properties();
-			sets.setProperty("accessToken", tk.getAccessToken());
-			sets.setProperty("refreshToken", tk.getRefreshToken());
-			FileOutputStream fout = new FileOutputStream(s);
-			sets.store(fout, "Cloud Mirror authentication token");
-			fout.flush();
-			fout.close();
+				// request authorization to user
+				GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory, config.getString(CLIENT_ID_KEY), config.getString(CLIENT_SECRET_KEY), Arrays.asList(DriveScopes.DRIVE)).build();
+				String url = flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build();
+				System.out.println("Please open the following URL in your browser then type the authorization code:");
+				System.out.println("  " + url);
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+				String code = br.readLine();
 
-			return tk;
+				// process response
+				GoogleTokenResponse response = flow.newTokenRequest(code).setRedirectUri(REDIRECT_URI).execute();
+				Credential credential = flow.createAndStoreCredential(response, null);
+
+				// store tokens
+				config.setProperty(ACCESS_TOKEN_KEY, credential.getAccessToken());
+				config.setProperty(REFRESH_TOKEN_KEY, credential.getRefreshToken());
+				config.save();
+			}
+
+			// return token
+			return new TokenBO(config.getString(CLIENT_ID_KEY), config.getString(CLIENT_SECRET_KEY), config.getString(ACCESS_TOKEN_KEY), config.getString(REFRESH_TOKEN_KEY));
 
 		} catch (IOException ex) {
 
 			// re-throw exception
 			throw new WorkflowManagerException(ex.getMessage(), ex);
 
-		} catch (SdoException ex) {
+		} catch (ConfigurationException ex) {
 
 			// re-throw exception
 			throw new WorkflowManagerException(ex.getMessage(), ex);

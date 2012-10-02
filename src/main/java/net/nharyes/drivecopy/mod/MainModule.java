@@ -24,28 +24,64 @@ import net.nharyes.drivecopy.biz.wfm.TokenWorkflowManager;
 import net.nharyes.drivecopy.biz.wfm.TokenWorkflowManagerImpl;
 import net.nharyes.drivecopy.srvc.DriveSdo;
 import net.nharyes.drivecopy.srvc.DriveSdoImpl;
-import net.nharyes.drivecopy.srvc.TokenSdo;
-import net.nharyes.drivecopy.srvc.TokenSdoImpl;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 
 public class MainModule extends AbstractModule {
+
+	/*
+	 * Constants
+	 */
+	private final String configFile = "drivecopy.properties";
+
+	@Provides
+	@Singleton
+	private PropertiesConfiguration providePropertiesConfiguration() {
+
+		PropertiesConfiguration config;
+
+		try {
+
+			// load configuration from file
+			config = new PropertiesConfiguration(configFile);
+
+		} catch (ConfigurationException ex) {
+
+			// create empty configuration
+			config = new PropertiesConfiguration();
+			config.setFileName(configFile);
+		}
+
+		return config;
+	}
 
 	@Override
 	protected void configure() {
 
-		// Docs SDO
-		bind(DriveSdo.class).to(DriveSdoImpl.class);
+		// HTTP transport
+		bind(HttpTransport.class).to(NetHttpTransport.class).in(Singleton.class);
 
-		// Token SDO
-		bind(TokenSdo.class).to(TokenSdoImpl.class);
+		// JSON factory
+		bind(JsonFactory.class).to(JacksonFactory.class).in(Singleton.class);
+
+		// Drive SDO
+		bind(DriveSdo.class).to(DriveSdoImpl.class);
 
 		// File Storage Workflow Manager
 		bind(FileStorageWorkflowManager.class).to(FileStorageWorkflowManagerImpl.class);
 
 		// Directory Compressor Workflow Manager
 		bind(DirectoryCompressorWorkflowManager.class).to(DirectoryCompressorWorkflowManagerImpl.class);
-		
+
 		// Token Workflow Manager
 		bind(TokenWorkflowManager.class).to(TokenWorkflowManagerImpl.class);
 	}

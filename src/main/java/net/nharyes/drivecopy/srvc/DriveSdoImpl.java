@@ -21,7 +21,6 @@ import java.io.IOException;
 
 import net.nharyes.drivecopy.biz.bo.EntryBO;
 import net.nharyes.drivecopy.biz.bo.TokenBO;
-import net.nharyes.drivecopy.biz.exc.WorkflowManagerException;
 import net.nharyes.drivecopy.srvc.exc.ItemNotFoundException;
 import net.nharyes.drivecopy.srvc.exc.SdoException;
 
@@ -30,36 +29,33 @@ import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.Drive.Files;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class DriveSdoImpl implements DriveSdo {
 
-	/**
-	 * Constants
-	 */
-	private static String CLIENT_ID = "[CLIENT_ID]";
-	private static String CLIENT_SECRET = "[CLIENT_SECRET]";
-
+	// HTTP transport
 	private HttpTransport httpTransport;
 
+	// JSON factory
 	private JsonFactory jsonFactory;
 
-	public DriveSdoImpl() throws WorkflowManagerException {
+	@Inject
+	public DriveSdoImpl(HttpTransport httpTransport, JsonFactory jsonFactory) {
 
-		httpTransport = new NetHttpTransport();
-		jsonFactory = new com.google.api.client.json.jackson2.JacksonFactory();
+		this.httpTransport = httpTransport;
+		this.jsonFactory = jsonFactory;
 	}
 
 	private Drive getService(TokenBO token) {
 
-		GoogleCredential credential = new GoogleCredential.Builder().setClientSecrets(CLIENT_ID, CLIENT_SECRET).setJsonFactory(jsonFactory).setTransport(httpTransport).build().setRefreshToken(token.getRefreshToken()).setAccessToken(token.getAccessToken());
+		GoogleCredential credential = new GoogleCredential.Builder().setClientSecrets(token.getClientId(), token.getClientSecret()).setJsonFactory(jsonFactory).setTransport(httpTransport).build().setRefreshToken(token.getRefreshToken()).setAccessToken(token.getAccessToken());
 		return new Drive.Builder(httpTransport, jsonFactory, credential).build();
 	}
 
