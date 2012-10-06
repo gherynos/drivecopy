@@ -25,6 +25,8 @@ public class EntryBO implements BusinessObject {
 	private File file;
 	
 	private String name;
+	
+	private String mimeType;
 
 	public String getId() {
 		
@@ -50,5 +52,15 @@ public class EntryBO implements BusinessObject {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getMimeType() {
+
+		return mimeType;
+	}
+
+	public void setMimeType(String mimeType) {
+
+		this.mimeType = mimeType;
 	}
 }

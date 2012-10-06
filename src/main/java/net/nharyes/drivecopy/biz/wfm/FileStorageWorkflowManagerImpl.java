@@ -111,6 +111,14 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
 					// replace file
 					doc.setFile(dirBO.getFile());
+
+					// set ZIP MIME type
+					doc.setMimeType("application/zip");
+
+				} else {
+
+					// set generic MIME type
+					doc.setMimeType("application/octet-stream");
 				}
 
 				// upload entry
@@ -162,7 +170,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			if (file.isDirectory()) {
 
 				// create temporary file
-				File tempFile = File.createTempFile("cloudmirror" + System.currentTimeMillis(), "temp");
+				File tempFile = File.createTempFile("drivecopy" + System.currentTimeMillis(), "temp");
 
 				// set file property
 				entry.setFile(tempFile);

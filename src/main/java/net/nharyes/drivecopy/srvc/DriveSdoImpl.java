@@ -102,10 +102,10 @@ public class DriveSdoImpl implements DriveSdo {
 			// create file item
 			File body = new File();
 			body.setTitle(entry.getName());
-			body.setMimeType("application/octet-stream");
+			body.setMimeType(entry.getMimeType());
 
 			// set content
-			FileContent mediaContent = new FileContent("application/octet-stream", entry.getFile());
+			FileContent mediaContent = new FileContent(entry.getMimeType(), entry.getFile());
 
 			// upload file
 			File file = getService(token).files().insert(body, mediaContent).execute();
@@ -159,7 +159,7 @@ public class DriveSdoImpl implements DriveSdo {
 
 			// compose list query
 			Files.List request = getService(token).files().list();
-			request.setQ("title = '" + name + "' and trashed = false and mimeType != 'application/vnd.google-apps.folder'");
+			request.setQ(String.format("title = '%s' and trashed = false and mimeType != 'application/vnd.google-apps.folder'", name));
 			request.setMaxResults(2);
 
 			// execute query
