@@ -51,9 +51,10 @@ public class Main {
 	/*
 	 * Constants
 	 */
-	private static final String DESCRIPTION = "Uploads, downloads and replaces files from and to Google Drive.";
+	private static final String DESCRIPTION = "Utility to download, replace and upload Google Drive binary files.";
 	private static final String JAR_FILE = "drivecopy.jar";
 
+	// command line options
 	private Options options = new Options();
 
 	public Main(String[] args) {
@@ -71,7 +72,7 @@ public class Main {
 
 			// check log option
 			if (line.hasOption('L'))
-				Logger.getLogger("net.nharyes.drivecopy").addHandler(new FileHandler(line.getOptionValue('L')));
+				Logger.getLogger(getClass().getPackage().getName()).addHandler(new FileHandler(line.getOptionValue('L')));
 
 			// check arguments number
 			if (line.getArgs().length == 0)
@@ -215,8 +216,8 @@ public class Main {
 	public static void main(String[] args) {
 
 		// set logger handler
-		Logger.getLogger("net.nharyes.drivecopy").setUseParentHandlers(false);
-		Logger.getLogger("net.nharyes.drivecopy").addHandler(new SystemOutHandler());
+		Logger.getLogger(Main.class.getPackage().getName()).setUseParentHandlers(false);
+		Logger.getLogger(Main.class.getPackage().getName()).addHandler(new SystemOutHandler());
 
 		new Main(args);
 	}
