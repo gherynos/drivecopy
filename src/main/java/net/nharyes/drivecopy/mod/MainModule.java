@@ -16,6 +16,8 @@
 
 package net.nharyes.drivecopy.mod;
 
+import net.nharyes.drivecopy.FileDownloadProgressListener;
+import net.nharyes.drivecopy.FileUploadProgressListener;
 import net.nharyes.drivecopy.biz.wfm.DirectoryCompressorWorkflowManager;
 import net.nharyes.drivecopy.biz.wfm.DirectoryCompressorWorkflowManagerImpl;
 import net.nharyes.drivecopy.biz.wfm.FileStorageWorkflowManager;
@@ -28,6 +30,8 @@ import net.nharyes.drivecopy.srvc.DriveSdoImpl;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+import com.google.api.client.googleapis.media.MediaHttpDownloaderProgressListener;
+import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -76,6 +80,12 @@ public class MainModule extends AbstractModule {
 		// Drive SDO
 		bind(DriveSdo.class).to(DriveSdoImpl.class);
 
+		// File upload Progress Listener
+		bind(MediaHttpUploaderProgressListener.class).to(FileUploadProgressListener.class);
+		
+		// File download Progress Listener
+		bind(MediaHttpDownloaderProgressListener.class).to(FileDownloadProgressListener.class);
+		
 		// File Storage Workflow Manager
 		bind(FileStorageWorkflowManager.class).to(FileStorageWorkflowManagerImpl.class);
 

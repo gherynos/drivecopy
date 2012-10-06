@@ -25,13 +25,19 @@ import net.nharyes.drivecopy.srvc.exc.ItemNotFoundException;
 import net.nharyes.drivecopy.srvc.exc.SdoException;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.media.MediaHttpDownloader;
+import com.google.api.client.googleapis.media.MediaHttpDownloaderProgressListener;
+import com.google.api.client.googleapis.media.MediaHttpUploader;
+import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.Drive.Files.Get;
+import com.google.api.services.drive.Drive.Files.Insert;
+import com.google.api.services.drive.Drive.Files.Update;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.inject.Inject;
@@ -46,11 +52,19 @@ public class DriveSdoImpl implements DriveSdo {
 	// JSON factory
 	private JsonFactory jsonFactory;
 
+	// File upload progress listener
+	private MediaHttpUploaderProgressListener fileUploadProgressListener;
+
+	// File download progress listener
+	private MediaHttpDownloaderProgressListener fileDownloadProgressListener;
+
 	@Inject
-	public DriveSdoImpl(HttpTransport httpTransport, JsonFactory jsonFactory) {
+	public DriveSdoImpl(HttpTransport httpTransport, JsonFactory jsonFactory, MediaHttpUploaderProgressListener fileUploadProgressListener, MediaHttpDownloaderProgressListener fileDownloadProgressListener) {
 
 		this.httpTransport = httpTransport;
 		this.jsonFactory = jsonFactory;
+		this.fileUploadProgressListener = fileUploadProgressListener;
+		this.fileDownloadProgressListener = fileDownloadProgressListener;
 	}
 
 	private Drive getService(TokenBO token) {
@@ -66,15 +80,18 @@ public class DriveSdoImpl implements DriveSdo {
 
 			// get file
 			Drive service = getService(token);
-			File file = service.files().get(entry.getId()).execute();
+			Get get = service.files().get(entry.getId());
+			MediaHttpDownloader downloader = get.getMediaHttpDownloader();
+			downloader.setDirectDownloadEnabled(false);
+			downloader.setProgressListener(fileDownloadProgressListener);
+			File file = get.execute();
 
 			// check download URL and size
 			if (file.getDownloadUrl() != null && file.getDownloadUrl().length() > 0) {
 
 				// download file
-				HttpResponse resp = service.getRequestFactory().buildGetRequest(new GenericUrl(file.getDownloadUrl())).execute();
 				FileOutputStream fout = new FileOutputStream(entry.getFile());
-				resp.download(fout);
+				downloader.download(new GenericUrl(file.getDownloadUrl()), fout);
 				fout.flush();
 				fout.close();
 
@@ -108,7 +125,11 @@ public class DriveSdoImpl implements DriveSdo {
 			FileContent mediaContent = new FileContent(entry.getMimeType(), entry.getFile());
 
 			// upload file
-			File file = getService(token).files().insert(body, mediaContent).execute();
+			Insert insert = getService(token).files().insert(body, mediaContent);
+			MediaHttpUploader uploader = insert.getMediaHttpUploader();
+			uploader.setDirectUploadEnabled(false);
+			uploader.setProgressListener(fileUploadProgressListener);
+			File file = insert.execute();
 
 			// compose output entry
 			EntryBO entryBO = new EntryBO();
@@ -136,7 +157,11 @@ public class DriveSdoImpl implements DriveSdo {
 			FileContent mediaContent = new FileContent(file.getMimeType(), entry.getFile());
 
 			// update file
-			File updatedFile = service.files().update(entry.getId(), file, mediaContent).execute();
+			Update update = service.files().update(entry.getId(), file, mediaContent);
+			MediaHttpUploader uploader = update.getMediaHttpUploader();
+			uploader.setDirectUploadEnabled(false);
+			uploader.setProgressListener(fileUploadProgressListener);
+			File updatedFile = update.execute();
 
 			// compose output entry
 			EntryBO docBO = new EntryBO();
