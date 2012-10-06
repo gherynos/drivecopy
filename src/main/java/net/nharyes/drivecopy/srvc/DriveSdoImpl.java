@@ -159,7 +159,7 @@ public class DriveSdoImpl implements DriveSdo {
 
 			// compose list query
 			Files.List request = getService(token).files().list();
-			request.setQ("title contains '" + name + "'");
+			request.setQ("title = '" + name + "' and trashed = false and mimeType != 'application/vnd.google-apps.folder'");
 			request.setMaxResults(2);
 
 			// execute query
