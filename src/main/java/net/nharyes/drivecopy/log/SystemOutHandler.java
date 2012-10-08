@@ -17,13 +17,21 @@
 package net.nharyes.drivecopy.log;
 
 import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
 
 public class SystemOutHandler extends ConsoleHandler {
 
 	public SystemOutHandler() {
-		
+
 		super();
+
+		// output to System.out
 		setOutputStream(System.out);
+
+		// INFO level
+		setLevel(Level.INFO);
+
+		// tiny formatter
 		setFormatter(new TinyFormatter());
 	}
 }

@@ -36,10 +36,10 @@ public class FileDownloadProgressListener implements MediaHttpDownloaderProgress
 
 		switch (downloader.getDownloadState()) {
 		case MEDIA_IN_PROGRESS:
-			logger.info(String.format("progress: %s", MessageFormat.format("{0,number,#%}", downloader.getProgress())));
+			logger.info(String.format("Progress: %s", MessageFormat.format("{0,number,#%}", downloader.getProgress())));
 			break;
 		case MEDIA_COMPLETE:
-			logger.info("download complete");
+			logger.info("Download complete");
 			break;
 		case NOT_STARTED:
 			break;

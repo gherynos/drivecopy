@@ -37,16 +37,16 @@ public class FileUploadProgressListener implements MediaHttpUploaderProgressList
 
 		switch (uploader.getUploadState()) {
 		case INITIATION_STARTED:
-			logger.info("starting upload...");
+			logger.info("Starting upload...");
 			break;
 		case INITIATION_COMPLETE:
-			logger.info("upload started");
+			logger.info("Upload started");
 			break;
 		case MEDIA_IN_PROGRESS:
-			logger.info(String.format("progress: %s", MessageFormat.format("{0,number,#%}", uploader.getProgress())));
+			logger.info(String.format("Progress: %s", MessageFormat.format("{0,number,#%}", uploader.getProgress())));
 			break;
 		case MEDIA_COMPLETE:
-			logger.info("upload complete");
+			logger.info("Upload complete");
 			break;
 		case NOT_STARTED:
 			break;

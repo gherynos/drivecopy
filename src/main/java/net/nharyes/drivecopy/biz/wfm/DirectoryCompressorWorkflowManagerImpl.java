@@ -62,7 +62,8 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 			logger.fine("Compress directory");
 
 			// create temporary file
-			File tempFile = File.createTempFile("cloudmirror" + System.currentTimeMillis(), "temp");
+			File tempFile = File.createTempFile("drivecopy" + System.currentTimeMillis(), "temp");
+			logger.fine(String.format("Created temporary file '%s'", tempFile.getAbsolutePath()));
 
 			// create output stream
 			BufferedOutputStream bout = new BufferedOutputStream(new FileOutputStream(tempFile));
@@ -93,6 +94,9 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 
 		try {
 
+			// log action
+			logger.fine("Decompress directory");
+
 			// output stream
 			FileInputStream fin = new FileInputStream(directory.getFile());
 			ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fin));
@@ -105,7 +109,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 			while ((entry = zis.getNextEntry()) != null) {
 
 				// status
-				logger.info(String.format("decompressing '%s'", entry.getName().substring(entry.getName().lastIndexOf(File.separator) + 1)));
+				logger.info(String.format("Decompressing '%s'", entry.getName().substring(entry.getName().lastIndexOf(File.separator) + 1)));
 
 				// eventually create subdirectories for file
 				String f = directory.getDestinationDirectory().getAbsolutePath() + File.separator + entry.getName();
@@ -119,7 +123,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 				if (!fl.createNewFile()) {
 
 					// notify UI
-					logger.warning(String.format("unable to decompress '%s'", fl.getAbsolutePath()));
+					logger.warning(String.format("Unable to decompress '%s'", fl.getAbsolutePath()));
 
 					// read entry from stream
 					while ((count = zis.read(data, 0, BUFFER)) != -1) {
@@ -156,7 +160,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 		if (!f.canRead()) {
 
 			// notify UI
-			logger.warning(String.format("unable to compress '%s'", f.getAbsolutePath()));
+			logger.warning(String.format("Unable to compress '%s'", f.getAbsolutePath()));
 
 			// add to not compressed files
 			notCompressed.add(f);
@@ -180,7 +184,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 			String entryName = f.getAbsolutePath().substring(f.getAbsolutePath().indexOf(path) + path.length() + 1);
 
 			// status
-			logger.info(String.format("compressing '%s'", f.getName()));
+			logger.info(String.format("Compressing '%s'", f.getName()));
 
 			// create input stream
 			BufferedInputStream bin = new BufferedInputStream(new FileInputStream(f), BUFFER);

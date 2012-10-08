@@ -81,7 +81,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			TokenBO token = getToken();
 
 			// log action
-			logger.info("Upload file");
+			logger.info(String.format("Upload file '%s' to entry '%s'", file.getFile().getAbsolutePath(), file.getName()));
 
 			try {
 
@@ -102,9 +102,8 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 				DirectoryBO dirBO = new DirectoryBO();
 				if (file.isDirectory()) {
 
-					logger.fine("Compress directory");
-
 					// compress directory
+					logger.info(String.format("Compress directory with level '%d'", file.getCompressionLevel()));
 					dirBO.setFile(file.getFile());
 					dirBO.setLevel(file.getCompressionLevel());
 					dirBO = directoryCompressorWorkflowManager.handleWorkflow(dirBO, DirectoryCompressorWorkflowManager.ACTION_COMPRESS);
@@ -122,11 +121,13 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 				}
 
 				// upload entry
+				logger.fine(String.format("MIME type of the entry: %s", doc.getMimeType()));
 				doc = driveSdo.uploadEntry(token, doc);
 
 				// eventually delete file or directory
 				if (file.isDeleteAfter()) {
 
+					logger.info("Process file(s) for deletion...");
 					processFileForDeletion(file.getFile(), dirBO.getNotCompressed());
 				}
 
@@ -157,11 +158,11 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			TokenBO token = getToken();
 
 			// log action
-			logger.info("Download file");
+			logger.info(String.format("Download entry '%s' to file '%s'", file.getName(), file.getFile().getAbsolutePath()));
 
 			// check delete after
 			if (file.isDeleteAfter())
-				logger.info("delete option ignored");
+				logger.warning("Delete option ignored");
 
 			// search entry
 			EntryBO entry = driveSdo.searchEntry(token, file.getName());
@@ -171,6 +172,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
 				// create temporary file
 				File tempFile = File.createTempFile("drivecopy" + System.currentTimeMillis(), "temp");
+				logger.fine(String.format("Created temporary file '%s'", tempFile.getAbsolutePath()));
 
 				// set file property
 				entry.setFile(tempFile);
@@ -187,7 +189,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			// check directory
 			if (file.isDirectory()) {
 
-				logger.fine("Decompress file");
+				logger.info("Decompress file");
 
 				// decompress file
 				DirectoryBO dirBO = new DirectoryBO();
@@ -196,6 +198,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 				dirBO = directoryCompressorWorkflowManager.handleWorkflow(dirBO, DirectoryCompressorWorkflowManager.ACTION_DECOMPRESS);
 
 				// delete downloaded file
+				logger.fine("Delete downloaded file");
 				entry.getFile().delete();
 
 				// return decompressed directory
@@ -231,7 +234,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			TokenBO token = getToken();
 
 			// log action
-			logger.info("Replace file");
+			logger.info(String.format("Replace entry '%s' with file '%s'", file.getName(), file.getFile().getAbsolutePath()));
 
 			// search entry
 			EntryBO entry = driveSdo.searchEntry(token, file.getName());
@@ -243,9 +246,8 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			DirectoryBO dirBO = new DirectoryBO();
 			if (file.isDirectory()) {
 
-				logger.fine("Compress directory");
-
 				// compress directory
+				logger.info(String.format("Compress directory with level '%d'", file.getCompressionLevel()));
 				dirBO.setFile(file.getFile());
 				dirBO.setLevel(file.getCompressionLevel());
 				dirBO = directoryCompressorWorkflowManager.handleWorkflow(dirBO, DirectoryCompressorWorkflowManager.ACTION_COMPRESS);
@@ -260,12 +262,14 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			// eventually delete temporary file
 			if (file.isDirectory()) {
 
+				logger.fine("Delete temporary file");
 				entry.getFile().delete();
 			}
 
 			// eventually delete file or directory
 			if (file.isDeleteAfter()) {
 
+				logger.info("Process file(s) for deletion...");
 				processFileForDeletion(file.getFile(), dirBO.getNotCompressed());
 			}
 
@@ -293,7 +297,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 		if (notCompressed.contains(f) || !f.canRead() || !f.canWrite()) {
 
 			// notify UI
-			logger.warning(String.format("file '%s' not deleted", f.getAbsolutePath()));
+			logger.warning(String.format("File '%s' not deleted", f.getAbsolutePath()));
 
 			return;
 		}
@@ -302,12 +306,14 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 		if (f.isDirectory()) {
 
 			// process all files contained
+			logger.fine(String.format("Process directory '%s' for deletion", f.getAbsolutePath()));
 			File[] files = f.listFiles();
 			for (File fl : files)
 				processFileForDeletion(fl, notCompressed);
 		}
 
 		// delete file/directory
+		logger.fine(String.format("Delete file/directory '%s'", f.getAbsolutePath()));
 		f.delete();
 	}
 }

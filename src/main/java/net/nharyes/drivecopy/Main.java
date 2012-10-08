@@ -71,8 +71,14 @@ public class Main {
 			CommandLine line = parser.parse(options, args);
 
 			// check log option
-			if (line.hasOption('L'))
-				Logger.getLogger(getClass().getPackage().getName()).addHandler(new FileHandler(line.getOptionValue('L')));
+			if (line.hasOption('L')) {
+
+				// add file handler
+				FileHandler handler = new FileHandler(line.getOptionValue('L'));
+				handler.setLevel(Level.FINE);
+				Logger.getLogger(getClass().getPackage().getName()).addHandler(handler);
+				logger.info(String.format("Added log output file '%s'", line.getOptionValue('L')));
+			}
 
 			// check arguments number
 			if (line.getArgs().length == 0)
@@ -216,8 +222,10 @@ public class Main {
 	public static void main(String[] args) {
 
 		// set logger handler
-		Logger.getLogger(Main.class.getPackage().getName()).setUseParentHandlers(false);
-		Logger.getLogger(Main.class.getPackage().getName()).addHandler(new SystemOutHandler());
+		Logger logger = Logger.getLogger(Main.class.getPackage().getName());
+		logger.setUseParentHandlers(false);
+		logger.addHandler(new SystemOutHandler());
+		logger.setLevel(Level.FINE);
 
 		new Main(args);
 	}

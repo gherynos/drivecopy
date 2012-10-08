@@ -18,6 +18,7 @@ package net.nharyes.drivecopy.srvc;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import net.nharyes.drivecopy.biz.bo.EntryBO;
 import net.nharyes.drivecopy.biz.bo.TokenBO;
@@ -46,6 +47,11 @@ import com.google.inject.Singleton;
 @Singleton
 public class DriveSdoImpl implements DriveSdo {
 
+	/*
+	 * Logger
+	 */
+	protected final Logger logger = Logger.getLogger(getClass().getName());
+	
 	// HTTP transport
 	private HttpTransport httpTransport;
 
@@ -188,6 +194,7 @@ public class DriveSdoImpl implements DriveSdo {
 			request.setMaxResults(2);
 
 			// execute query
+			logger.fine(String.format("Search entry with name '%s'", name));
 			FileList files = request.execute();
 
 			// check no results
