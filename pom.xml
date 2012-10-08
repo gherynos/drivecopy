@@ -10,9 +10,34 @@
 	<name>DriveCopy</name>
 	<url>https://github.com/Gherynos/DriveCopy</url>
 
+	<developers>
+		<developer>
+			<id>gherynos</id>
+			<name>Luca Zanconato</name>
+			<email>luca.zanconato@nharyes.net</email>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+
 	<properties>
+		<github.user>Gherynos</github.user>
+		<github.repository>DriveCopy</github.repository>
+		<github.repository.url>http://github.com/${github.user}/${github.repository}</github.repository.url>
+		<github.connection>scm:git:ssh://git@github.com/${github.user}/${github.repository}</github.connection>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
+	<scm>
+		<url>${github.repository.url}</url>
+		<connection>${github.connection}</connection>
+		<developerConnection>${github.connection}</developerConnection>
+	</scm>
 
 	<repositories>
 		<repository>
