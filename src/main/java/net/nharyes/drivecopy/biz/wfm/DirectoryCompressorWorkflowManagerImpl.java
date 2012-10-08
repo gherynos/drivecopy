@@ -140,6 +140,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 					}
 					dest.flush();
 					dest.close();
+					logger.fine("file data written");
 				}
 			}
 			zis.close();
@@ -198,6 +199,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 				zout.write(data, 0, count);
 			}
 			bin.close();
+			logger.fine("ZIP entry created");
 		}
 	}
 }
