@@ -3,31 +3,38 @@ Drive Copy
 
 Drive Copy is a simple command line utility to download, replace and upload Google Drive binary files.
 
+Getting started
+---------------
+
+Download the [latest release](https://github.com/downloads/Gherynos/DriveCopy/drivecopy-1.0.0.jar) and see the examples below.
+For the complete list of options see the [How To](https://github.com/Gherynos/DriveCopy/wiki/How-To).
+
 Features
 --------
 
 * download binary files from Google Drive
 * upload binary files to Google Drive
 * replace Google Drive binary files
+* backup directories to Google Drive
 
 Usage
 -----
 
 Download a file:
 
-```
+```bash
 $ java -jar drivecopy.jar -f [local_file] download [drive_file]
 ```
 
 Upload a file:
 
-```
+```bash
 $ java -jar drivecopy.jar -f [local_file] upload [drive_file]
 ```
 
 Replace a file:
 
-```
+```bash
 $ java -jar drivecopy.jar -f [local_file] replace [drive_file]
 ```
 
