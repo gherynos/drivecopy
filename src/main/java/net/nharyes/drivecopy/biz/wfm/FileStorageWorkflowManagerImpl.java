@@ -97,6 +97,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 				EntryBO doc = new EntryBO();
 				doc.setFile(file.getFile());
 				doc.setName(file.getName());
+				doc.setMimeType(file.getMimeType());
 
 				// check directory
 				DirectoryBO dirBO = new DirectoryBO();
@@ -111,17 +112,19 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 					// replace file
 					doc.setFile(dirBO.getFile());
 
-					// set ZIP MIME type
-					doc.setMimeType("application/zip");
+					// eventually set ZIP MIME type
+					if (doc.getMimeType() == null)
+						doc.setMimeType("application/zip");
 
 				} else {
 
-					// set generic MIME type
-					doc.setMimeType("application/octet-stream");
+					// eventually set generic MIME type
+					if (doc.getMimeType() == null)
+						doc.setMimeType("application/octet-stream");
 				}
 
 				// upload entry
-				logger.fine(String.format("MIME type of the entry: %s", doc.getMimeType()));
+				logger.info(String.format("MIME type of the entry: %s", doc.getMimeType()));
 				doc = driveSdo.uploadEntry(token, doc);
 
 				// eventually delete file or directory
@@ -160,9 +163,13 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			// log action
 			logger.info(String.format("Download entry '%s' to file '%s'", file.getName(), file.getFile().getAbsolutePath()));
 
-			// check delete after
+			// check delete after option
 			if (file.isDeleteAfter())
 				logger.warning("Delete option ignored");
+
+			// check MIME type option
+			if (file.getMimeType() != null)
+				logger.warning("MIME type option ignored");
 
 			// search entry
 			EntryBO entry = driveSdo.searchEntry(token, file.getName());
@@ -242,6 +249,9 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			// set file property
 			entry.setFile(file.getFile());
 
+			// set MIME type property
+			entry.setMimeType(file.getMimeType());
+
 			// check directory
 			DirectoryBO dirBO = new DirectoryBO();
 			if (file.isDirectory()) {
@@ -254,9 +264,20 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
 				// replace file
 				entry.setFile(dirBO.getFile());
+
+				// eventually set ZIP MIME type
+				if (entry.getMimeType() == null)
+					entry.setMimeType("application/zip");
+
+			} else {
+
+				// eventually set generic MIME type
+				if (entry.getMimeType() == null)
+					entry.setMimeType("application/octet-stream");
 			}
 
 			// replace entry
+			logger.info(String.format("MIME type of the entry: %s", entry.getMimeType()));
 			entry = driveSdo.updateEntry(token, entry);
 
 			// eventually delete temporary file

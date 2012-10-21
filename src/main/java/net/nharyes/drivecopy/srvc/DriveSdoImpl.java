@@ -51,7 +51,7 @@ public class DriveSdoImpl implements DriveSdo {
 	 * Logger
 	 */
 	protected final Logger logger = Logger.getLogger(getClass().getName());
-	
+
 	// HTTP transport
 	private HttpTransport httpTransport;
 
@@ -160,7 +160,8 @@ public class DriveSdoImpl implements DriveSdo {
 			File file = service.files().get(entry.getId()).execute();
 
 			// update file content
-			FileContent mediaContent = new FileContent(file.getMimeType(), entry.getFile());
+			FileContent mediaContent = new FileContent(entry.getMimeType(), entry.getFile());
+			file.setMimeType(entry.getMimeType());
 
 			// update file
 			Update update = service.files().update(entry.getId(), file, mediaContent);

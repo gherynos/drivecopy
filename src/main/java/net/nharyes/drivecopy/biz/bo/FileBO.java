@@ -29,6 +29,8 @@ public class FileBO implements BusinessObject {
 	private boolean isDirectory;
 	
 	private boolean deleteAfter;
+	
+	private String mimeType;
 
 	public File getFile() {
 		
@@ -78,5 +80,15 @@ public class FileBO implements BusinessObject {
 	public void setDeleteAfter(boolean deleteAfter) {
 		
 		this.deleteAfter = deleteAfter;
+	}
+
+	public String getMimeType() {
+
+		return mimeType;
+	}
+
+	public void setMimeType(String mimeType) {
+
+		this.mimeType = mimeType;
 	}
 }

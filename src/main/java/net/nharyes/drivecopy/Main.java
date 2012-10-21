@@ -46,7 +46,7 @@ public class Main {
 	/*
 	 * Version
 	 */
-	public static final String VERSION = "1.0.1";
+	public static final String VERSION = "1.1.0";
 	
 	/*
 	 * Logger
@@ -126,6 +126,10 @@ public class Main {
 			fileBO.setDeleteAfter(false);
 			if (line.hasOption('D'))
 				fileBO.setDeleteAfter(true);
+			
+			// MIME type
+			if (line.hasOption('m'))
+				fileBO.setMimeType(line.getOptionValue('m'));
 
 			// get Workflow Manager
 			Injector injector = Guice.createInjector(new MainModule());
@@ -224,6 +228,15 @@ public class Main {
 		log.setType(String.class);
 		log.setDescription("where file is the log file to write");
 		options.addOption(log);
+		
+		// MIME type option
+		Option mimeType = OptionBuilder.create('m');
+		mimeType.setLongOpt("mimetype");
+		mimeType.setArgs(1);
+		mimeType.setArgName("type");
+		mimeType.setType(String.class);
+		mimeType.setDescription("where type is the MIME type string to set for the remote entry. The default values are 'application/octet-stream' for files and 'application/zip' for compressed directories.");
+		options.addOption(mimeType);
 	}
 
 	public static void main(String[] args) {

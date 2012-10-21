@@ -4,7 +4,7 @@
 
 	<groupId>net.nharyes</groupId>
 	<artifactId>drivecopy</artifactId>
-	<version>1.0.1</version>
+	<version>1.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>DriveCopy</name>
