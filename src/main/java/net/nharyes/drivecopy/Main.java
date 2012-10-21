@@ -44,6 +44,11 @@ import com.google.inject.Injector;
 public class Main {
 
 	/*
+	 * Version
+	 */
+	public static final String VERSION = "1.0.1";
+	
+	/*
 	 * Logger
 	 */
 	protected final Logger logger = Logger.getLogger(getClass().getName());
@@ -133,7 +138,9 @@ public class Main {
 
 			// print help
 			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp("java -jar " + JAR_FILE + " [OPTIONS] [MODE] [ENTRY]", DESCRIPTION + "\n", options, "\nMODE can be download/replace/upload.\nENTRY is the name of the entry in Google Drive.");
+			System.out.println("Drive Copy version "+VERSION);
+			System.out.println();
+			formatter.printHelp("java -jar " + JAR_FILE + " [OPTIONS] <MODE> <ENTRY>", DESCRIPTION + "\n", options, "\nMODE can be download/replace/upload.\nENTRY is the name of the entry in Google Drive.");
 			System.out.println();
 
 			// log exception
@@ -182,7 +189,7 @@ public class Main {
 		directory.setLongOpt("directory");
 		directory.setArgs(1);
 		directory.setArgName("path");
-		directory.setDescription("where path is the directory to upload/download/replace (it will be archived into a single file).");
+		directory.setDescription("where path is the local directory to upload/download/replace (it will be archived into a single remote file).");
 
 		// file and directory group
 		OptionGroup group = new OptionGroup();
@@ -206,7 +213,7 @@ public class Main {
 		delete.setLongOpt("delete");
 		delete.setOptionalArg(true);
 		delete.setType(Boolean.class);
-		delete.setDescription("delete file/directory after entry uploaded/replaced.");
+		delete.setDescription("delete local file/directory after remote entry uploaded/replaced.");
 		options.addOption(delete);
 
 		// log option

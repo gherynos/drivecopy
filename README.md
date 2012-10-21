@@ -23,19 +23,19 @@ Usage
 Download a file:
 
 ```bash
-$ java -jar drivecopy.jar -f [local_file] download [drive_file]
+$ java -jar drivecopy.jar -f <local_file> download <drive_file>
 ```
 
 Upload a file:
 
 ```bash
-$ java -jar drivecopy.jar -f [local_file] upload [drive_file]
+$ java -jar drivecopy.jar -f <local_file> upload <drive_file>
 ```
 
 Replace a file:
 
 ```bash
-$ java -jar drivecopy.jar -f [local_file] replace [drive_file]
+$ java -jar drivecopy.jar -f <local_file> replace <drive_file>
 ```
 
 Copyright and license
