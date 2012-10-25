@@ -73,7 +73,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 			// process file and subdirectories
 			DirectoryBO dirBO = new DirectoryBO();
 			String filePath = directory.getFile().getAbsolutePath();
-			processFile(new File(filePath), zout, filePath.substring(0, filePath.lastIndexOf(File.separator)), dirBO.getNotCompressed());
+			processFile(new File(filePath), zout, filePath, dirBO.getNotCompressed());
 
 			// close output stream
 			zout.close();
@@ -100,6 +100,9 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 			// output stream
 			FileInputStream fin = new FileInputStream(directory.getFile());
 			ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fin));
+
+			// create directory if not present
+			directory.getDestinationDirectory().mkdirs();
 
 			// process zip entries
 			int count;

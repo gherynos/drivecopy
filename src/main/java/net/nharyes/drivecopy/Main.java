@@ -47,7 +47,7 @@ public class Main {
 	 * Version
 	 */
 	public static final String VERSION = "1.1.0";
-	
+
 	/*
 	 * Logger
 	 */
@@ -87,9 +87,7 @@ public class Main {
 
 			// check arguments number
 			if (line.getArgs().length == 0)
-				throw new ParseException("Missing arguments MODE and ENTRY.");
-			if (line.getArgs().length == 1)
-				throw new ParseException("Missing argument ENTRY.");
+				throw new ParseException("Missing argument MODE");
 
 			// check mode
 			int action = -1;
@@ -105,9 +103,6 @@ public class Main {
 			// compose BO
 			FileBO fileBO = new FileBO();
 
-			// entry
-			fileBO.setName(line.getArgs()[1]);
-
 			// check directory
 			char c = 'f';
 			fileBO.setDirectory(false);
@@ -115,9 +110,14 @@ public class Main {
 
 				c = 'd';
 				fileBO.setDirectory(true);
-
 			}
 			fileBO.setFile(new File(line.getOptionValue(c)));
+
+			// entry name
+			if (line.getArgs().length == 2)
+				fileBO.setName(line.getArgs()[1]);
+			else
+				fileBO.setName(fileBO.getFile().getName());
 
 			// compression level
 			fileBO.setCompressionLevel(Integer.parseInt(line.getOptionValue('l', "0")));
@@ -126,7 +126,7 @@ public class Main {
 			fileBO.setDeleteAfter(false);
 			if (line.hasOption('D'))
 				fileBO.setDeleteAfter(true);
-			
+
 			// MIME type
 			if (line.hasOption('m'))
 				fileBO.setMimeType(line.getOptionValue('m'));
@@ -142,9 +142,9 @@ public class Main {
 
 			// print help
 			HelpFormatter formatter = new HelpFormatter();
-			System.out.println("Drive Copy version "+VERSION);
+			System.out.println("Drive Copy version " + VERSION);
 			System.out.println();
-			formatter.printHelp("java -jar " + JAR_FILE + " [OPTIONS] <MODE> <ENTRY>", DESCRIPTION + "\n", options, "\nMODE can be download/replace/upload.\nENTRY is the name of the entry in Google Drive.");
+			formatter.printHelp("java -jar " + JAR_FILE + " [OPTIONS] <MODE> [ENTRY]", DESCRIPTION + "\n", options, "\nMODE can be download/replace/upload.\nENTRY is the name of the entry in Google Drive; if not set, the name of the local file/directory will be used.");
 			System.out.println();
 
 			// log exception
@@ -228,7 +228,7 @@ public class Main {
 		log.setType(String.class);
 		log.setDescription("where file is the log file to write");
 		options.addOption(log);
-		
+
 		// MIME type option
 		Option mimeType = OptionBuilder.create('m');
 		mimeType.setLongOpt("mimetype");

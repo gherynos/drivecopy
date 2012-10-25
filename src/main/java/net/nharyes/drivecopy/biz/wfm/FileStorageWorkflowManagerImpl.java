@@ -81,7 +81,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			TokenBO token = getToken();
 
 			// log action
-			logger.info(String.format("Upload file '%s' to entry '%s'", file.getFile().getAbsolutePath(), file.getName()));
+			logger.info(String.format("Upload '%s' to entry '%s'", file.getFile().getAbsolutePath(), file.getName()));
 
 			try {
 
@@ -161,7 +161,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			TokenBO token = getToken();
 
 			// log action
-			logger.info(String.format("Download entry '%s' to file '%s'", file.getName(), file.getFile().getAbsolutePath()));
+			logger.info(String.format("Download entry '%s' to '%s'", file.getName(), file.getFile().getAbsolutePath()));
 
 			// check delete after option
 			if (file.isDeleteAfter())
@@ -241,7 +241,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			TokenBO token = getToken();
 
 			// log action
-			logger.info(String.format("Replace entry '%s' with file '%s'", file.getName(), file.getFile().getAbsolutePath()));
+			logger.info(String.format("Replace entry '%s' with '%s'", file.getName(), file.getFile().getAbsolutePath()));
 
 			// search entry
 			EntryBO entry = driveSdo.searchEntry(token, file.getName());
