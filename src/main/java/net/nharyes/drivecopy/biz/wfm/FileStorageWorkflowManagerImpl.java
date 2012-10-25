@@ -83,6 +83,10 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			// log action
 			logger.info(String.format("Upload '%s' to entry '%s'", file.getFile().getAbsolutePath(), file.getName()));
 
+			// check skip revision option
+			if (file.isSkipRevision())
+				logger.warning("skip revision option ignored");
+
 			try {
 
 				// search entry
@@ -171,6 +175,10 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			if (file.getMimeType() != null)
 				logger.warning("MIME type option ignored");
 
+			// check skip revision option
+			if (file.isSkipRevision())
+				logger.warning("skip revision option ignored");
+
 			// search entry
 			EntryBO entry = driveSdo.searchEntry(token, file.getName());
 
@@ -251,6 +259,9 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
 			// set MIME type property
 			entry.setMimeType(file.getMimeType());
+			
+			// set skip revision flag
+			entry.setSkipRevision(file.isSkipRevision());
 
 			// check directory
 			DirectoryBO dirBO = new DirectoryBO();

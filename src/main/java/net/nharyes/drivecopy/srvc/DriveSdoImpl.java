@@ -165,6 +165,7 @@ public class DriveSdoImpl implements DriveSdo {
 
 			// update file
 			Update update = service.files().update(entry.getId(), file, mediaContent);
+			update.setNewRevision(!entry.isSkipRevision());
 			MediaHttpUploader uploader = update.getMediaHttpUploader();
 			uploader.setDirectUploadEnabled(false);
 			uploader.setProgressListener(fileUploadProgressListener);

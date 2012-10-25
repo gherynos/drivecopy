@@ -31,6 +31,8 @@ public class FileBO implements BusinessObject {
 	private boolean deleteAfter;
 	
 	private String mimeType;
+	
+	private boolean skipRevision;
 
 	public File getFile() {
 		
@@ -90,5 +92,15 @@ public class FileBO implements BusinessObject {
 	public void setMimeType(String mimeType) {
 
 		this.mimeType = mimeType;
+	}
+
+	public boolean isSkipRevision() {
+
+		return skipRevision;
+	}
+
+	public void setSkipRevision(boolean skipRevision) {
+
+		this.skipRevision = skipRevision;
 	}
 }

@@ -127,6 +127,11 @@ public class Main {
 			if (line.hasOption('D'))
 				fileBO.setDeleteAfter(true);
 
+			// check skip revision
+			fileBO.setSkipRevision(false);
+			if (line.hasOption('s'))
+				fileBO.setSkipRevision(true);
+
 			// MIME type
 			if (line.hasOption('m'))
 				fileBO.setMimeType(line.getOptionValue('m'));
@@ -237,6 +242,14 @@ public class Main {
 		mimeType.setType(String.class);
 		mimeType.setDescription("where type is the MIME type string to set for the remote entry. The default values are 'application/octet-stream' for files and 'application/zip' for compressed directories.");
 		options.addOption(mimeType);
+
+		// skip revision option
+		Option skipRevision = OptionBuilder.create('s');
+		skipRevision.setLongOpt("skiprevision");
+		skipRevision.setOptionalArg(true);
+		skipRevision.setType(Boolean.class);
+		skipRevision.setDescription("do not create a new revision when replacing remote entry.");
+		options.addOption(skipRevision);
 	}
 
 	public static void main(String[] args) {

@@ -27,6 +27,8 @@ public class EntryBO implements BusinessObject {
 	private String name;
 	
 	private String mimeType;
+	
+	private boolean skipRevision;
 
 	public String getId() {
 		
@@ -62,5 +64,15 @@ public class EntryBO implements BusinessObject {
 	public void setMimeType(String mimeType) {
 
 		this.mimeType = mimeType;
+	}
+
+	public boolean isSkipRevision() {
+
+		return skipRevision;
+	}
+
+	public void setSkipRevision(boolean skipRevision) {
+
+		this.skipRevision = skipRevision;
 	}
 }
