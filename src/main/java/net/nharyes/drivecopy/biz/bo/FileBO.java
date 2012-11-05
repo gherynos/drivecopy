@@ -33,6 +33,8 @@ public class FileBO implements BusinessObject {
 	private String mimeType;
 	
 	private boolean skipRevision;
+	
+	private boolean checkMd5;
 
 	public File getFile() {
 		
@@ -102,5 +104,15 @@ public class FileBO implements BusinessObject {
 	public void setSkipRevision(boolean skipRevision) {
 
 		this.skipRevision = skipRevision;
+	}
+
+	public boolean isCheckMd5() {
+
+		return checkMd5;
+	}
+
+	public void setCheckMd5(boolean checkMd5) {
+
+		this.checkMd5 = checkMd5;
 	}
 }

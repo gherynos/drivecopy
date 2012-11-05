@@ -136,6 +136,11 @@ public class Main {
 			if (line.hasOption('m'))
 				fileBO.setMimeType(line.getOptionValue('m'));
 
+			// check MD5 comparison
+			fileBO.setCheckMd5(false);
+			if (line.hasOption('c'))
+				fileBO.setCheckMd5(true);
+
 			// get Workflow Manager
 			Injector injector = Guice.createInjector(new MainModule());
 			FileStorageWorkflowManager wfm = injector.getInstance(FileStorageWorkflowManager.class);
@@ -250,6 +255,14 @@ public class Main {
 		skipRevision.setType(Boolean.class);
 		skipRevision.setDescription("do not create a new revision when replacing remote entry.");
 		options.addOption(skipRevision);
+
+		// check MD5 option
+		Option checkMd5 = OptionBuilder.create('c');
+		checkMd5.setLongOpt("checkmd5");
+		checkMd5.setOptionalArg(true);
+		checkMd5.setType(Boolean.class);
+		checkMd5.setDescription("compare uploaded/downloaded local file MD5 summary with the one of the entry.");
+		options.addOption(checkMd5);
 	}
 
 	public static void main(String[] args) {

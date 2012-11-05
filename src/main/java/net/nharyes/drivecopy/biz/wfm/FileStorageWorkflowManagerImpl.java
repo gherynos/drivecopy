@@ -18,6 +18,9 @@ package net.nharyes.drivecopy.biz.wfm;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import net.nharyes.drivecopy.biz.bo.DirectoryBO;
@@ -29,6 +32,7 @@ import net.nharyes.drivecopy.srvc.DriveSdo;
 import net.nharyes.drivecopy.srvc.exc.ItemNotFoundException;
 import net.nharyes.drivecopy.srvc.exc.SdoException;
 
+import com.google.common.io.Files;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -131,6 +135,22 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 				logger.info(String.format("MIME type of the entry: %s", doc.getMimeType()));
 				doc = driveSdo.uploadEntry(token, doc);
 
+				// eventually check MD5 of the uploaded entry
+				if (file.isCheckMd5()) {
+
+					// calculate MD5 of the local file/directory
+					logger.info("calculate the MD5 summary of the file...");
+					byte[] digest = Files.getDigest(doc.getFile(), MessageDigest.getInstance("MD5"));
+					String sDigest = new BigInteger(1, digest).toString(16);
+					logger.fine(String.format("digest of the file: %s", sDigest));
+					logger.fine(String.format("digest of the entry: %s", doc.getMd5Sum()));
+
+					// compare digests
+					if (!sDigest.equalsIgnoreCase(doc.getMd5Sum()))
+						throw new WorkflowManagerException("wrong digest!");
+					logger.info("digests comparison OK");
+				}
+
 				// eventually delete file or directory
 				if (file.isDeleteAfter()) {
 
@@ -151,6 +171,11 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			throw new WorkflowManagerException(ex.getMessage(), ex);
 
 		} catch (IOException ex) {
+
+			// re-throw exception
+			throw new WorkflowManagerException(ex.getMessage(), ex);
+
+		} catch (NoSuchAlgorithmException ex) {
 
 			// re-throw exception
 			throw new WorkflowManagerException(ex.getMessage(), ex);
@@ -201,6 +226,22 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			// download entry
 			entry = driveSdo.downloadEntry(token, entry);
 
+			// eventually check MD5 of the downloaded entry
+			if (file.isCheckMd5()) {
+
+				// calculate MD5 of the local file/directory
+				logger.info("calculate the MD5 summary of the file...");
+				byte[] digest = Files.getDigest(entry.getFile(), MessageDigest.getInstance("MD5"));
+				String sDigest = new BigInteger(1, digest).toString(16);
+				logger.fine(String.format("digest of the file: %s", sDigest));
+				logger.fine(String.format("digest of the entry: %s", entry.getMd5Sum()));
+
+				// compare digests
+				if (!sDigest.equalsIgnoreCase(entry.getMd5Sum()))
+					throw new WorkflowManagerException("wrong digest!");
+				logger.info("digests comparison OK");
+			}
+
 			// check directory
 			if (file.isDirectory()) {
 
@@ -238,6 +279,11 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
 			// re-throw exception
 			throw new WorkflowManagerException(ex.getMessage(), ex);
+
+		} catch (NoSuchAlgorithmException ex) {
+
+			// re-throw exception
+			throw new WorkflowManagerException(ex.getMessage(), ex);
 		}
 	}
 
@@ -259,7 +305,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
 			// set MIME type property
 			entry.setMimeType(file.getMimeType());
-			
+
 			// set skip revision flag
 			entry.setSkipRevision(file.isSkipRevision());
 
@@ -291,6 +337,22 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			logger.info(String.format("MIME type of the entry: %s", entry.getMimeType()));
 			entry = driveSdo.updateEntry(token, entry);
 
+			// eventually check MD5 of the replaced entry
+			if (file.isCheckMd5()) {
+
+				// calculate MD5 of the local file/directory
+				logger.info("calculate the MD5 summary of the file...");
+				byte[] digest = Files.getDigest(entry.getFile(), MessageDigest.getInstance("MD5"));
+				String sDigest = new BigInteger(1, digest).toString(16);
+				logger.fine(String.format("digest of the file: %s", sDigest));
+				logger.fine(String.format("digest of the entry: %s", entry.getMd5Sum()));
+
+				// compare digests
+				if (!sDigest.equalsIgnoreCase(entry.getMd5Sum()))
+					throw new WorkflowManagerException("wrong digest!");
+				logger.info("digests comparison OK");
+			}
+
 			// eventually delete temporary file
 			if (file.isDirectory()) {
 
@@ -317,6 +379,11 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			throw new WorkflowManagerException(ex.getMessage(), ex);
 
 		} catch (IOException ex) {
+
+			// re-throw exception
+			throw new WorkflowManagerException(ex.getMessage(), ex);
+
+		} catch (NoSuchAlgorithmException ex) {
 
 			// re-throw exception
 			throw new WorkflowManagerException(ex.getMessage(), ex);

@@ -101,7 +101,8 @@ public class DriveSdoImpl implements DriveSdo {
 				fout.flush();
 				fout.close();
 
-				// return the same entry
+				// return entry
+				entry.setMd5Sum(file.getMd5Checksum());
 				return entry;
 
 			} else {
@@ -141,6 +142,7 @@ public class DriveSdoImpl implements DriveSdo {
 			EntryBO entryBO = new EntryBO();
 			entryBO.setId(file.getId());
 			entryBO.setFile(entry.getFile());
+			entryBO.setMd5Sum(file.getMd5Checksum());
 			return entryBO;
 
 		} catch (IOException ex) {
@@ -176,6 +178,7 @@ public class DriveSdoImpl implements DriveSdo {
 			docBO.setId(updatedFile.getId());
 			docBO.setName(updatedFile.getTitle());
 			docBO.setFile(entry.getFile());
+			docBO.setMd5Sum(updatedFile.getMd5Checksum());
 			return docBO;
 
 		} catch (IOException ex) {

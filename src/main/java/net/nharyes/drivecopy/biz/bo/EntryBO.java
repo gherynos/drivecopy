@@ -29,6 +29,8 @@ public class EntryBO implements BusinessObject {
 	private String mimeType;
 	
 	private boolean skipRevision;
+	
+	private String md5Sum;
 
 	public String getId() {
 		
@@ -74,5 +76,15 @@ public class EntryBO implements BusinessObject {
 	public void setSkipRevision(boolean skipRevision) {
 
 		this.skipRevision = skipRevision;
+	}
+
+	public String getMd5Sum() {
+
+		return md5Sum;
+	}
+
+	public void setMd5Sum(String md5Sum) {
+
+		this.md5Sum = md5Sum;
 	}
 }
