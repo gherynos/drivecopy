@@ -141,6 +141,11 @@ public class Main {
 			if (line.hasOption('c'))
 				fileBO.setCheckMd5(true);
 
+			// check force
+			fileBO.setForce(false);
+			if (line.hasOption('F'))
+				fileBO.setForce(true);
+
 			// get Workflow Manager
 			Injector injector = Guice.createInjector(new MainModule());
 			FileStorageWorkflowManager wfm = injector.getInstance(FileStorageWorkflowManager.class);
@@ -261,8 +266,16 @@ public class Main {
 		checkMd5.setLongOpt("checkmd5");
 		checkMd5.setOptionalArg(true);
 		checkMd5.setType(Boolean.class);
-		checkMd5.setDescription("compare uploaded/downloaded local file MD5 summary with the one of the entry.");
+		checkMd5.setDescription("compare uploaded/downloaded local file MD5 summary with the one of the remote entry.");
 		options.addOption(checkMd5);
+
+		// check force creation option
+		Option forceCreation = OptionBuilder.create('F');
+		forceCreation.setLongOpt("force");
+		forceCreation.setOptionalArg(true);
+		forceCreation.setType(Boolean.class);
+		forceCreation.setDescription("forces the creation of the remote entry when replace is selected and the entry doesn't exist.");
+		options.addOption(forceCreation);
 	}
 
 	public static void main(String[] args) {

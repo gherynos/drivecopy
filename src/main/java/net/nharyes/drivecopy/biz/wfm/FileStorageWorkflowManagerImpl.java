@@ -77,7 +77,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 		return tokenWorkflowManager.handleWorkflow(new TokenBO(), TokenWorkflowManager.ACTION_GET);
 	}
 
-	private FileBO upload(FileBO file) throws WorkflowManagerException {
+	private FileBO upsert(FileBO file, boolean upload) throws WorkflowManagerException {
 
 		try {
 
@@ -85,85 +85,128 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			TokenBO token = getToken();
 
 			// log action
-			logger.info(String.format("Upload '%s' to entry '%s'", file.getFile().getAbsolutePath(), file.getName()));
+			if (upload)
+				logger.info(String.format("Upload '%s' to entry '%s'", file.getFile().getAbsolutePath(), file.getName()));
+			else
+				logger.info(String.format("Replace entry '%s' with '%s'", file.getName(), file.getFile().getAbsolutePath()));
 
-			// check skip revision option
-			if (file.isSkipRevision())
-				logger.warning("skip revision option ignored");
+			// check force option
+			if (upload && file.isForce())
+				logger.warning("force option ignored");
 
+			EntryBO entry = null;
 			try {
 
 				// search entry
-				driveSdo.searchEntry(token, file.getName());
+				entry = driveSdo.searchEntry(token, file.getName());
 
-				// entry already exists
-				throw new SdoException(String.format("Entry with name '%s' already exists", file.getName()));
+				if (upload) {
+
+					// entry already exists
+					throw new SdoException(String.format("Entry with name '%s' already exists", file.getName()));
+				}
 
 			} catch (ItemNotFoundException ex) {
 
-				// compose BO
-				EntryBO doc = new EntryBO();
-				doc.setFile(file.getFile());
-				doc.setName(file.getName());
-				doc.setMimeType(file.getMimeType());
+				// check force option
+				if (!upload && !file.isForce()) {
 
-				// check directory
-				DirectoryBO dirBO = new DirectoryBO();
-				if (file.isDirectory()) {
+					// re-throw exception
+					throw ex;
 
-					// compress directory
-					logger.info(String.format("Compress directory with level '%d'", file.getCompressionLevel()));
-					dirBO.setFile(file.getFile());
-					dirBO.setLevel(file.getCompressionLevel());
-					dirBO = directoryCompressorWorkflowManager.handleWorkflow(dirBO, DirectoryCompressorWorkflowManager.ACTION_COMPRESS);
+				} else if (!upload && file.isForce()) {
 
-					// replace file
-					doc.setFile(dirBO.getFile());
-
-					// eventually set ZIP MIME type
-					if (doc.getMimeType() == null)
-						doc.setMimeType("application/zip");
-
-				} else {
-
-					// eventually set generic MIME type
-					if (doc.getMimeType() == null)
-						doc.setMimeType("application/octet-stream");
+					// switch to upload mode
+					upload = true;
+					logger.info("Switched to upload mode");
 				}
 
-				// upload entry
-				logger.info(String.format("MIME type of the entry: %s", doc.getMimeType()));
-				doc = driveSdo.uploadEntry(token, doc);
+				if (upload) {
 
-				// eventually check MD5 of the uploaded entry
-				if (file.isCheckMd5()) {
-
-					// calculate MD5 of the local file/directory
-					logger.info("calculate the MD5 summary of the file...");
-					byte[] digest = Files.getDigest(doc.getFile(), MessageDigest.getInstance("MD5"));
-					String sDigest = new BigInteger(1, digest).toString(16);
-					logger.fine(String.format("digest of the file: %s", sDigest));
-					logger.fine(String.format("digest of the entry: %s", doc.getMd5Sum()));
-
-					// compare digests
-					if (!sDigest.equalsIgnoreCase(doc.getMd5Sum()))
-						throw new WorkflowManagerException("wrong digest!");
-					logger.info("digests comparison OK");
+					// compose BO
+					entry = new EntryBO();
+					entry.setName(file.getName());
 				}
-
-				// eventually delete file or directory
-				if (file.isDeleteAfter()) {
-
-					logger.info("Process file(s) for deletion...");
-					processFileForDeletion(file.getFile(), dirBO.getNotCompressed());
-				}
-
-				// return uploaded entry
-				FileBO fBO = new FileBO();
-				fBO.setFile(doc.getFile());
-				fBO.setName(doc.getName());
-				return fBO;
 			}
+
+			// set file property
+			entry.setFile(file.getFile());
+
+			// set MIME type property
+			entry.setMimeType(file.getMimeType());
+
+			// check skip revision option
+			if (file.isSkipRevision() && upload)
+				logger.warning("skip revision option ignored");
+			else
+				entry.setSkipRevision(file.isSkipRevision());
+
+			// check directory
+			DirectoryBO dirBO = new DirectoryBO();
+			if (file.isDirectory()) {
+
+				// compress directory
+				logger.info(String.format("Compress directory with level '%d'", file.getCompressionLevel()));
+				dirBO.setFile(file.getFile());
+				dirBO.setLevel(file.getCompressionLevel());
+				dirBO = directoryCompressorWorkflowManager.handleWorkflow(dirBO, DirectoryCompressorWorkflowManager.ACTION_COMPRESS);
+
+				// replace file
+				entry.setFile(dirBO.getFile());
+
+				// eventually set ZIP MIME type
+				if (entry.getMimeType() == null)
+					entry.setMimeType("application/zip");
+
+			} else {
+
+				// eventually set generic MIME type
+				if (entry.getMimeType() == null)
+					entry.setMimeType("application/octet-stream");
+			}
+
+			// upload/replace entry
+			logger.info(String.format("MIME type of the entry: %s", entry.getMimeType()));
+			if (upload)
+				entry = driveSdo.uploadEntry(token, entry);
+			else
+				entry = driveSdo.updateEntry(token, entry);
+
+			// eventually check MD5 of the replaced entry
+			if (file.isCheckMd5()) {
+
+				// calculate MD5 of the local file/directory
+				logger.info("calculate the MD5 summary of the file...");
+				byte[] digest = Files.getDigest(entry.getFile(), MessageDigest.getInstance("MD5"));
+				String sDigest = new BigInteger(1, digest).toString(16);
+				logger.fine(String.format("digest of the file: %s", sDigest));
+				logger.fine(String.format("digest of the entry: %s", entry.getMd5Sum()));
+
+				// compare digests
+				if (!sDigest.equalsIgnoreCase(entry.getMd5Sum()))
+					throw new WorkflowManagerException("wrong digest!");
+				logger.info("digests comparison OK");
+			}
+
+			// eventually delete temporary file
+			if (file.isDirectory()) {
+
+				logger.fine("Delete temporary file");
+				entry.getFile().delete();
+			}
+
+			// eventually delete file or directory
+			if (file.isDeleteAfter()) {
+
+				logger.info("Process file(s) for deletion...");
+				processFileForDeletion(file.getFile(), dirBO.getNotCompressed());
+			}
+
+			// return updated entry
+			FileBO fBO = new FileBO();
+			fBO.setFile(entry.getFile());
+			fBO.setName(entry.getName());
+			return fBO;
 
 		} catch (SdoException ex) {
 
@@ -180,6 +223,11 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			// re-throw exception
 			throw new WorkflowManagerException(ex.getMessage(), ex);
 		}
+	}
+
+	private FileBO upload(FileBO file) throws WorkflowManagerException {
+
+		return upsert(file, true);
 	}
 
 	private FileBO download(FileBO file) throws WorkflowManagerException {
@@ -289,105 +337,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
 	private FileBO replace(FileBO file) throws WorkflowManagerException {
 
-		try {
-
-			// get token
-			TokenBO token = getToken();
-
-			// log action
-			logger.info(String.format("Replace entry '%s' with '%s'", file.getName(), file.getFile().getAbsolutePath()));
-
-			// search entry
-			EntryBO entry = driveSdo.searchEntry(token, file.getName());
-
-			// set file property
-			entry.setFile(file.getFile());
-
-			// set MIME type property
-			entry.setMimeType(file.getMimeType());
-
-			// set skip revision flag
-			entry.setSkipRevision(file.isSkipRevision());
-
-			// check directory
-			DirectoryBO dirBO = new DirectoryBO();
-			if (file.isDirectory()) {
-
-				// compress directory
-				logger.info(String.format("Compress directory with level '%d'", file.getCompressionLevel()));
-				dirBO.setFile(file.getFile());
-				dirBO.setLevel(file.getCompressionLevel());
-				dirBO = directoryCompressorWorkflowManager.handleWorkflow(dirBO, DirectoryCompressorWorkflowManager.ACTION_COMPRESS);
-
-				// replace file
-				entry.setFile(dirBO.getFile());
-
-				// eventually set ZIP MIME type
-				if (entry.getMimeType() == null)
-					entry.setMimeType("application/zip");
-
-			} else {
-
-				// eventually set generic MIME type
-				if (entry.getMimeType() == null)
-					entry.setMimeType("application/octet-stream");
-			}
-
-			// replace entry
-			logger.info(String.format("MIME type of the entry: %s", entry.getMimeType()));
-			entry = driveSdo.updateEntry(token, entry);
-
-			// eventually check MD5 of the replaced entry
-			if (file.isCheckMd5()) {
-
-				// calculate MD5 of the local file/directory
-				logger.info("calculate the MD5 summary of the file...");
-				byte[] digest = Files.getDigest(entry.getFile(), MessageDigest.getInstance("MD5"));
-				String sDigest = new BigInteger(1, digest).toString(16);
-				logger.fine(String.format("digest of the file: %s", sDigest));
-				logger.fine(String.format("digest of the entry: %s", entry.getMd5Sum()));
-
-				// compare digests
-				if (!sDigest.equalsIgnoreCase(entry.getMd5Sum()))
-					throw new WorkflowManagerException("wrong digest!");
-				logger.info("digests comparison OK");
-			}
-
-			// eventually delete temporary file
-			if (file.isDirectory()) {
-
-				logger.fine("Delete temporary file");
-				entry.getFile().delete();
-			}
-
-			// eventually delete file or directory
-			if (file.isDeleteAfter()) {
-
-				logger.info("Process file(s) for deletion...");
-				processFileForDeletion(file.getFile(), dirBO.getNotCompressed());
-			}
-
-			// return updated entry
-			FileBO fBO = new FileBO();
-			fBO.setFile(entry.getFile());
-			fBO.setName(entry.getName());
-			return fBO;
-
-		} catch (SdoException ex) {
-
-			// re-throw exception
-			throw new WorkflowManagerException(ex.getMessage(), ex);
-
-		} catch (IOException ex) {
-
-			// re-throw exception
-			throw new WorkflowManagerException(ex.getMessage(), ex);
-
-		} catch (NoSuchAlgorithmException ex) {
-
-			// re-throw exception
-			throw new WorkflowManagerException(ex.getMessage(), ex);
-		}
+		return upsert(file, false);
 	}
 
 	private void processFileForDeletion(File f, List<File> notCompressed) throws IOException {

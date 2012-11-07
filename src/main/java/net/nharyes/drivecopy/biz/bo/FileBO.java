@@ -21,68 +21,70 @@ import java.io.File;
 public class FileBO implements BusinessObject {
 
 	private File file;
-	
+
 	private String name;
-	
+
 	private int compressionLevel;
-	
+
 	private boolean isDirectory;
-	
+
 	private boolean deleteAfter;
-	
+
 	private String mimeType;
-	
+
 	private boolean skipRevision;
-	
+
 	private boolean checkMd5;
 
+	private boolean force;
+
 	public File getFile() {
-		
+
 		return file;
 	}
 
 	public void setFile(File file) {
-		
+
 		this.file = file;
 	}
 
 	public String getName() {
-		
+
 		return name;
 	}
 
 	public void setName(String name) {
-		
+
 		this.name = name;
 	}
 
 	public int getCompressionLevel() {
-		
+
 		return compressionLevel;
 	}
 
 	public void setCompressionLevel(int compressionLevel) {
-		
+
 		this.compressionLevel = compressionLevel;
 	}
 
 	public boolean isDirectory() {
-		
+
 		return isDirectory;
 	}
 
 	public void setDirectory(boolean isDirectory) {
-		
+
 		this.isDirectory = isDirectory;
 	}
 
 	public boolean isDeleteAfter() {
-		
+
 		return deleteAfter;
 	}
 
 	public void setDeleteAfter(boolean deleteAfter) {
-		
+
 		this.deleteAfter = deleteAfter;
 	}
 
@@ -114,5 +116,15 @@ public class FileBO implements BusinessObject {
 	public void setCheckMd5(boolean checkMd5) {
 
 		this.checkMd5 = checkMd5;
+	}
+
+	public boolean isForce() {
+
+		return force;
+	}
+
+	public void setForce(boolean force) {
+
+		this.force = force;
 	}
 }
