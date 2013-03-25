@@ -19,8 +19,6 @@ package net.nharyes.drivecopy.biz.wfm;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import net.nharyes.drivecopy.biz.bo.DirectoryBO;
@@ -32,6 +30,7 @@ import net.nharyes.drivecopy.srvc.DriveSdo;
 import net.nharyes.drivecopy.srvc.exc.ItemNotFoundException;
 import net.nharyes.drivecopy.srvc.exc.SdoException;
 
+import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -177,7 +176,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
 				// calculate MD5 of the local file/directory
 				logger.info("calculate the MD5 summary of the file...");
-				byte[] digest = Files.getDigest(entry.getFile(), MessageDigest.getInstance("MD5"));
+				byte[] digest = Files.hash(entry.getFile(), Hashing.md5()).asBytes();
 				String sDigest = new BigInteger(1, digest).toString(16);
 				logger.fine(String.format("digest of the file: %s", sDigest));
 				logger.fine(String.format("digest of the entry: %s", entry.getMd5Sum()));
@@ -214,11 +213,6 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			throw new WorkflowManagerException(ex.getMessage(), ex);
 
 		} catch (IOException ex) {
-
-			// re-throw exception
-			throw new WorkflowManagerException(ex.getMessage(), ex);
-
-		} catch (NoSuchAlgorithmException ex) {
 
 			// re-throw exception
 			throw new WorkflowManagerException(ex.getMessage(), ex);
@@ -279,7 +273,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
 				// calculate MD5 of the local file/directory
 				logger.info("calculate the MD5 summary of the file...");
-				byte[] digest = Files.getDigest(entry.getFile(), MessageDigest.getInstance("MD5"));
+				byte[] digest = Files.hash(entry.getFile(), Hashing.md5()).asBytes();
 				String sDigest = new BigInteger(1, digest).toString(16);
 				logger.fine(String.format("digest of the file: %s", sDigest));
 				logger.fine(String.format("digest of the entry: %s", entry.getMd5Sum()));
@@ -324,11 +318,6 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			throw new WorkflowManagerException(ex.getMessage(), ex);
 
 		} catch (IOException ex) {
-
-			// re-throw exception
-			throw new WorkflowManagerException(ex.getMessage(), ex);
-
-		} catch (NoSuchAlgorithmException ex) {
 
 			// re-throw exception
 			throw new WorkflowManagerException(ex.getMessage(), ex);

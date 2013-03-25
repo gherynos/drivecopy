@@ -76,7 +76,7 @@ public class DriveSdoImpl implements DriveSdo {
 	private Drive getService(TokenBO token) {
 
 		GoogleCredential credential = new GoogleCredential.Builder().setClientSecrets(token.getClientId(), token.getClientSecret()).setJsonFactory(jsonFactory).setTransport(httpTransport).build().setRefreshToken(token.getRefreshToken()).setAccessToken(token.getAccessToken());
-		return new Drive.Builder(httpTransport, jsonFactory, credential).build();
+		return new Drive.Builder(httpTransport, jsonFactory, credential).setApplicationName("DriveCopy").build();
 	}
 
 	@Override

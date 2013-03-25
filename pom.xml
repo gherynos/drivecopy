@@ -42,7 +42,7 @@
 	<repositories>
 		<repository>
 			<id>google-api-services</id>
-			<url>http://mavenrepo.google-api-java-client.googlecode.com/hg</url>
+			<url>http://google-api-client-libraries.appspot.com/mavenrepo</url>
 		</repository>
 	</repositories>
 
@@ -72,17 +72,17 @@
 		<dependency>
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-drive</artifactId>
-			<version>v2-rev9-1.8.0-beta</version>
+			<version>v2-rev60-1.13.2-beta</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.http-client</groupId>
 			<artifactId>google-http-client</artifactId>
-			<version>1.11.0-beta</version>
+			<version>1.13.1-beta</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.http-client</groupId>
 			<artifactId>google-http-client-jackson2</artifactId>
-			<version>1.11.0-beta</version>
+			<version>1.13.1-beta</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-configuration</groupId>
