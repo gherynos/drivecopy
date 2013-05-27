@@ -110,7 +110,7 @@ public class DriveSdoImpl implements DriveSdo {
 			} else {
 
 				// the file doesn't have any content stored on Drive
-				throw new ItemNotFoundException(String.format("File with id '%s' doesn't have any content stored on Drive", entry.getId()));
+				throw new ItemNotFoundException(String.format("Remote file with id '%s' doesn't have any content stored on Drive", entry.getId()));
 			}
 
 		} catch (IOException ex) {
@@ -218,21 +218,21 @@ public class DriveSdoImpl implements DriveSdo {
 					request.setMaxResults(2);
 
 					// execute query
-					logger.fine(String.format("Search folder with name '%s'", currentFolder));
+					logger.fine(String.format("Search remote folder with name '%s'", currentFolder));
 					FileList fs = request.execute();
 
 					// check no results
 					if (fs.getItems().isEmpty())
-						throw new ItemNotFoundException(String.format("No folder found with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in folder '%s'", lastParentName) : ""));
+						throw new ItemNotFoundException(String.format("No remote folder found with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
 
 					// check multiple results
 					if (fs.getItems().size() > 1)
-						throw new SdoException(String.format("Multiple results for folder with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in folder '%s'", lastParentName) : ""));
+						throw new SdoException(String.format("Multiple results for remote folder with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
 
 					// check exact title
 					File folder = fs.getItems().get(0);
 					if (!folder.getTitle().equals(currentFolder))
-						throw new ItemNotFoundException(String.format("No folder found with exact name '%s'%s", currentFolder, lastParentName != null ? String.format(" in folder '%s'", lastParentName) : ""));
+						throw new ItemNotFoundException(String.format("No remote folder found with exact name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
 
 					// set parent ID for next folder/file
 					lastParentId = folder.getId();
@@ -265,7 +265,7 @@ public class DriveSdoImpl implements DriveSdo {
 
 			// check no results
 			if (files.getItems().isEmpty())
-				throw new ItemNotFoundException(String.format("No file found with name '%s'", name));
+				throw new ItemNotFoundException(String.format("No remote file found with name '%s'", name));
 
 			// check multiple results
 			if (files.getItems().size() > 1)
@@ -274,7 +274,7 @@ public class DriveSdoImpl implements DriveSdo {
 			// check exact title
 			File file = files.getItems().get(0);
 			if (!file.getTitle().equals(name))
-				throw new ItemNotFoundException(String.format("No file found with exact name '%s'", name));
+				throw new ItemNotFoundException(String.format("No remote file found with exact name '%s'", name));
 
 			// return entry
 			EntryBO entry = new EntryBO();
