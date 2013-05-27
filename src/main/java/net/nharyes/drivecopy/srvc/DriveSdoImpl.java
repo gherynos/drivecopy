@@ -19,6 +19,7 @@ package net.nharyes.drivecopy.srvc;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.nharyes.drivecopy.biz.bo.EntryBO;
@@ -33,6 +34,8 @@ import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.services.drive.Drive;
@@ -53,6 +56,11 @@ public class DriveSdoImpl implements DriveSdo {
 	 * Logger
 	 */
 	protected final Logger logger = Logger.getLogger(getClass().getName());
+
+	/*
+	 * HTTP Request read and connect timeout
+	 */
+	private static final int HTTP_REQUEST_TIMEOUT = 3 * 600000;
 
 	// HTTP transport
 	private HttpTransport httpTransport;
@@ -77,8 +85,30 @@ public class DriveSdoImpl implements DriveSdo {
 
 	private Drive getService(TokenBO token) {
 
-		GoogleCredential credential = new GoogleCredential.Builder().setClientSecrets(token.getClientId(), token.getClientSecret()).setJsonFactory(jsonFactory).setTransport(httpTransport).build().setRefreshToken(token.getRefreshToken()).setAccessToken(token.getAccessToken());
-		return new Drive.Builder(httpTransport, jsonFactory, credential).setApplicationName("DriveCopy").build();
+		final GoogleCredential credential = new GoogleCredential.Builder().setClientSecrets(token.getClientId(), token.getClientSecret()).setJsonFactory(jsonFactory).setTransport(httpTransport).build().setRefreshToken(token.getRefreshToken()).setAccessToken(token.getAccessToken());
+		Drive out = new Drive.Builder(httpTransport, jsonFactory, new HttpRequestInitializer() {
+
+			@Override
+			public void initialize(HttpRequest httpRequest) {
+
+				try {
+
+					// initialize credentials
+					credential.initialize(httpRequest);
+
+					// set connect and read timeouts
+					httpRequest.setConnectTimeout(HTTP_REQUEST_TIMEOUT);
+					httpRequest.setReadTimeout(HTTP_REQUEST_TIMEOUT);
+
+				} catch (IOException ex) {
+
+					// log exception
+					logger.log(Level.SEVERE, ex.getMessage(), ex);
+				}
+			}
+		}).setApplicationName("DriveCopy").build();
+
+		return out;
 	}
 
 	@Override
@@ -89,7 +119,7 @@ public class DriveSdoImpl implements DriveSdo {
 			// get file
 			Drive service = getService(token);
 			Get get = service.files().get(entry.getId());
-			MediaHttpDownloader downloader = get.getMediaHttpDownloader();
+			MediaHttpDownloader downloader = new MediaHttpDownloader(httpTransport, service.getRequestFactory().getInitializer());
 			downloader.setDirectDownloadEnabled(false);
 			downloader.setProgressListener(fileDownloadProgressListener);
 			File file = get.execute();
