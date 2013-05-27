@@ -42,7 +42,7 @@ $ java -jar drivecopy.jar -f <local_file> replace <drive_file>
 Copyright and license
 ---------------------
 
-Copyright 2012 Luca Zanconato (<luca.zanconato@nharyes.net>)
+Copyright 2012-2013 Luca Zanconato (<luca.zanconato@nharyes.net>)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this work except in compliance with the License.
