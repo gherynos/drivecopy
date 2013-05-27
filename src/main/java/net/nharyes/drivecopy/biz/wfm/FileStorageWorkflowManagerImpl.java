@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Luca Zanconato
+ * Copyright 2012-2013 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,32 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 		return tokenWorkflowManager.handleWorkflow(new TokenBO(), TokenWorkflowManager.ACTION_GET);
 	}
 
+	private String[] extractFolders(String filePath) {
+
+		// extract folders
+		String[] folders = filePath.split("/");
+		if (folders.length > 1) {
+
+			// remove file name from folders
+			String[] nf = new String[folders.length - 1];
+			System.arraycopy(folders, 0, nf, 0, nf.length);
+			folders = nf;
+
+		} else
+			folders = null;
+
+		return folders;
+	}
+
+	private String extractFileName(String filePath) {
+
+		// return only file name
+		if (filePath.contains("/"))
+			return filePath.substring(filePath.lastIndexOf("/") + 1);
+
+		return filePath;
+	}
+
 	private FileBO upsert(FileBO file, boolean upload) throws WorkflowManagerException {
 
 		try {
@@ -94,10 +120,14 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 				logger.warning("force option ignored");
 
 			EntryBO entry = null;
+			String parentId = null;
 			try {
 
+				// process folders and get parent ID
+				parentId = driveSdo.getLastFolderId(token, extractFolders(file.getName()));
+
 				// search entry
-				entry = driveSdo.searchEntry(token, file.getName());
+				entry = driveSdo.searchEntry(token, extractFileName(file.getName()), parentId);
 
 				if (upload) {
 
@@ -124,7 +154,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
 					// compose BO
 					entry = new EntryBO();
-					entry.setName(file.getName());
+					entry.setName(extractFileName(file.getName()));
 				}
 			}
 
@@ -167,7 +197,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			// upload/replace entry
 			logger.info(String.format("MIME type of the entry: %s", entry.getMimeType()));
 			if (upload)
-				entry = driveSdo.uploadEntry(token, entry);
+				entry = driveSdo.uploadEntry(token, entry, parentId);
 			else
 				entry = driveSdo.updateEntry(token, entry);
 
@@ -246,8 +276,11 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			if (file.isSkipRevision())
 				logger.warning("skip revision option ignored");
 
+			// process folders and get parent ID
+			String parentId = driveSdo.getLastFolderId(token, extractFolders(file.getName()));
+
 			// search entry
-			EntryBO entry = driveSdo.searchEntry(token, file.getName());
+			EntryBO entry = driveSdo.searchEntry(token, extractFileName(file.getName()), parentId);
 
 			// check directory
 			if (file.isDirectory()) {

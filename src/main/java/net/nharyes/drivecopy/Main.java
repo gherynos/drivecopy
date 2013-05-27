@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Luca Zanconato
+ * Copyright 2012-2013 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class Main {
 	/*
 	 * Version
 	 */
-	public static final String VERSION = "1.1.1";
+	public static final String VERSION = "1.2.0";
 
 	/*
 	 * Logger
@@ -158,8 +158,9 @@ public class Main {
 			// print help
 			HelpFormatter formatter = new HelpFormatter();
 			System.out.println("Drive Copy version " + VERSION);
+			System.out.println("Copyright 2012-2013 Luca Zanconato (luca.zanconato@nharyes.net)");
 			System.out.println();
-			formatter.printHelp("java -jar " + JAR_FILE + " [OPTIONS] <MODE> [ENTRY]", DESCRIPTION + "\n", options, "\nMODE can be download/replace/upload.\nENTRY is the name of the entry in Google Drive; if not set, the name of the local file/directory will be used.");
+			formatter.printHelp("java -jar " + JAR_FILE + " [OPTIONS] <MODE> [ENTRY]", DESCRIPTION + "\n", options, "\nMODE can be download/replace/upload.\nENTRY is the path of the entry in Google Drive (i.e. \"Test Folder/Another Folder/file.txt\"); if not set, the name of the local file/directory will be used.");
 			System.out.println();
 
 			// log exception

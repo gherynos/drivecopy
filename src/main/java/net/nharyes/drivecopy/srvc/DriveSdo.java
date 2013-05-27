@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Luca Zanconato
+ * Copyright 2012-2013 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,11 @@ public interface DriveSdo {
 
 	EntryBO downloadEntry(TokenBO token, EntryBO entry) throws SdoException;
 
-	EntryBO uploadEntry(TokenBO token, EntryBO entry) throws SdoException;
+	EntryBO uploadEntry(TokenBO token, EntryBO entry, String parentId) throws SdoException;
 
 	EntryBO updateEntry(TokenBO token, EntryBO entry) throws SdoException;
 
-	EntryBO searchEntry(TokenBO token, String name) throws SdoException;
+	EntryBO searchEntry(TokenBO token, String name, String parentId) throws SdoException;
+
+	String getLastFolderId(TokenBO token, String[] folders) throws SdoException;
 }

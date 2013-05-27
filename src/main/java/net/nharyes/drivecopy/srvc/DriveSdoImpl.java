@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Luca Zanconato
+ * Copyright 2012-2013 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package net.nharyes.drivecopy.srvc;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import net.nharyes.drivecopy.biz.bo.EntryBO;
@@ -41,6 +42,7 @@ import com.google.api.services.drive.Drive.Files.Insert;
 import com.google.api.services.drive.Drive.Files.Update;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.ParentReference;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -119,7 +121,7 @@ public class DriveSdoImpl implements DriveSdo {
 	}
 
 	@Override
-	public EntryBO uploadEntry(TokenBO token, EntryBO entry) throws SdoException {
+	public EntryBO uploadEntry(TokenBO token, EntryBO entry, String parentId) throws SdoException {
 
 		try {
 
@@ -127,6 +129,15 @@ public class DriveSdoImpl implements DriveSdo {
 			File body = new File();
 			body.setTitle(entry.getName());
 			body.setMimeType(entry.getMimeType());
+
+			// eventually set parent
+			if (parentId != null) {
+
+				ParentReference newParent = new ParentReference();
+				newParent.setId(parentId);
+				body.setParents(new ArrayList<ParentReference>());
+				body.getParents().add(newParent);
+			}
 
 			// set content
 			FileContent mediaContent = new FileContent(entry.getMimeType(), entry.getFile());
@@ -189,13 +200,63 @@ public class DriveSdoImpl implements DriveSdo {
 	}
 
 	@Override
-	public EntryBO searchEntry(TokenBO token, String name) throws SdoException {
+	public String getLastFolderId(TokenBO token, String[] folders) throws SdoException {
+
+		try {
+
+			// check folders
+			String lastParentId = null;
+			String lastParentName = null;
+			if (folders != null) {
+
+				// check folders existence
+				for (String currentFolder : folders) {
+
+					// compose current folder query
+					Files.List request = getService(token).files().list();
+					request.setQ(String.format("title = '%s' and trashed = false and mimeType = 'application/vnd.google-apps.folder' and '%s' in parents", currentFolder, lastParentId != null ? lastParentId : "root"));
+					request.setMaxResults(2);
+
+					// execute query
+					logger.fine(String.format("Search folder with name '%s'", currentFolder));
+					FileList fs = request.execute();
+
+					// check no results
+					if (fs.getItems().isEmpty())
+						throw new ItemNotFoundException(String.format("No folder found with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in folder '%s'", lastParentName) : ""));
+
+					// check multiple results
+					if (fs.getItems().size() > 1)
+						throw new SdoException(String.format("Multiple results for folder with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in folder '%s'", lastParentName) : ""));
+
+					// check exact title
+					File folder = fs.getItems().get(0);
+					if (!folder.getTitle().equals(currentFolder))
+						throw new ItemNotFoundException(String.format("No folder found with exact name '%s'%s", currentFolder, lastParentName != null ? String.format(" in folder '%s'", lastParentName) : ""));
+
+					// set parent ID for next folder/file
+					lastParentId = folder.getId();
+					lastParentName = folder.getTitle();
+				}
+			}
+
+			return lastParentId;
+
+		} catch (IOException ex) {
+
+			// re-throw exception
+			throw new SdoException(ex.getMessage(), ex);
+		}
+	}
+
+	@Override
+	public EntryBO searchEntry(TokenBO token, String name, String parentId) throws SdoException {
 
 		try {
 
 			// compose list query
 			Files.List request = getService(token).files().list();
-			request.setQ(String.format("title = '%s' and trashed = false and mimeType != 'application/vnd.google-apps.folder'", name));
+			request.setQ(String.format("title = '%s' and trashed = false and mimeType != 'application/vnd.google-apps.folder' and '%s' in parents", name, parentId != null ? parentId : "root"));
 			request.setMaxResults(2);
 
 			// execute query
@@ -213,7 +274,7 @@ public class DriveSdoImpl implements DriveSdo {
 			// check exact title
 			File file = files.getItems().get(0);
 			if (!file.getTitle().equals(name))
-				throw new ItemNotFoundException(String.format("No file found with name '%s'", name));
+				throw new ItemNotFoundException(String.format("No file found with exact name '%s'", name));
 
 			// return entry
 			EntryBO entry = new EntryBO();
