@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import net.nharyes.drivecopy.biz.bo.EntryBO;
 import net.nharyes.drivecopy.biz.bo.TokenBO;
+import net.nharyes.drivecopy.srvc.exc.FolderNotFoundException;
 import net.nharyes.drivecopy.srvc.exc.ItemNotFoundException;
 import net.nharyes.drivecopy.srvc.exc.SdoException;
 
@@ -253,7 +254,7 @@ public class DriveSdoImpl implements DriveSdo {
 
 					// check no results
 					if (fs.getItems().isEmpty())
-						throw new ItemNotFoundException(String.format("No remote folder found with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
+						throw new FolderNotFoundException(String.format("No remote folder found with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
 
 					// check multiple results
 					if (fs.getItems().size() > 1)
@@ -262,7 +263,7 @@ public class DriveSdoImpl implements DriveSdo {
 					// check exact title
 					File folder = fs.getItems().get(0);
 					if (!folder.getTitle().equals(currentFolder))
-						throw new ItemNotFoundException(String.format("No remote folder found with exact name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
+						throw new FolderNotFoundException(String.format("No remote folder found with exact name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
 
 					// set parent ID for next folder/file
 					lastParentId = folder.getId();
