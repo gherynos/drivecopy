@@ -115,9 +115,17 @@ public class Main {
 			fileBO.setFile(new File(line.getOptionValue(c)));
 
 			// entry name
-			if (line.getArgs().length == 2)
-				fileBO.setName(line.getArgs()[1]);
-			else
+			if (line.getArgs().length == 2) {
+
+				// check slashes
+				String name = line.getArgs()[1];
+				if (name.startsWith("/"))
+					name = name.substring(1);
+				if (name.endsWith("/"))
+					name += "Untitled";
+				fileBO.setName(name);
+
+			} else
 				fileBO.setName(fileBO.getFile().getName());
 
 			// compression level
