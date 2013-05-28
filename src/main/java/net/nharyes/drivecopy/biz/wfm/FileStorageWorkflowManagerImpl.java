@@ -124,7 +124,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			try {
 
 				// process folders and get parent ID
-				parentId = driveSdo.getLastFolderId(token, extractFolders(file.getName()));
+				parentId = driveSdo.getLastFolderId(token, extractFolders(file.getName()), file.isCreateFolders());
 
 				// search entry
 				entry = driveSdo.searchEntry(token, extractFileName(file.getName()), parentId);
@@ -274,10 +274,14 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
 			// check skip revision option
 			if (file.isSkipRevision())
-				logger.warning("skip revision option ignored");
+				logger.warning("Skip revision option ignored");
+
+			// check create folders option
+			if (file.isCreateFolders())
+				logger.warning("Create folders option ignored");
 
 			// process folders and get parent ID
-			String parentId = driveSdo.getLastFolderId(token, extractFolders(file.getName()));
+			String parentId = driveSdo.getLastFolderId(token, extractFolders(file.getName()), false);
 
 			// search entry
 			EntryBO entry = driveSdo.searchEntry(token, extractFileName(file.getName()), parentId);

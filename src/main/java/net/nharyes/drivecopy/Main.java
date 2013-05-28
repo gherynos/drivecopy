@@ -147,6 +147,11 @@ public class Main {
 			if (line.hasOption('F'))
 				fileBO.setForce(true);
 
+			// check tree
+			fileBO.setCreateFolders(false);
+			if (line.hasOption('t'))
+				fileBO.setCreateFolders(true);
+
 			// get Workflow Manager
 			Injector injector;
 			if (line.hasOption('C'))
@@ -291,6 +296,14 @@ public class Main {
 		settings.setType(String.class);
 		settings.setDescription(String.format("where path is the path of the configuration file. The default value is '%s' in the same directory.", CONFIGURATION_FILE));
 		options.addOption(settings);
+
+		// create folders tree option
+		Option tree = OptionBuilder.create('t');
+		tree.setLongOpt("tree");
+		tree.setOptionalArg(true);
+		tree.setType(Boolean.class);
+		tree.setDescription("create remote folders tree if one or more remote folders are not found.");
+		options.addOption(tree);
 	}
 
 	public static void main(String[] args) {

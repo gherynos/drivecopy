@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Luca Zanconato
+ * Copyright 2012-2013 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ public class FileBO implements BusinessObject {
 	private boolean checkMd5;
 
 	private boolean force;
+	
+	private boolean createFolders;
 
 	public File getFile() {
 
@@ -126,5 +128,15 @@ public class FileBO implements BusinessObject {
 	public void setForce(boolean force) {
 
 		this.force = force;
+	}
+
+	public boolean isCreateFolders() {
+
+		return createFolders;
+	}
+
+	public void setCreateFolders(boolean createFolders) {
+
+		this.createFolders = createFolders;
 	}
 }

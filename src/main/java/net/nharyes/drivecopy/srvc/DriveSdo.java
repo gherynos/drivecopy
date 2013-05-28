@@ -30,5 +30,5 @@ public interface DriveSdo {
 
 	EntryBO searchEntry(TokenBO token, String name, String parentId) throws SdoException;
 
-	String getLastFolderId(TokenBO token, String[] folders) throws SdoException;
+	String getLastFolderId(TokenBO token, String[] folders, boolean createIfNotFound) throws SdoException;
 }

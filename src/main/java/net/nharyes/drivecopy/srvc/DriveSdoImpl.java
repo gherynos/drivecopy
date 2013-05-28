@@ -19,6 +19,7 @@ package net.nharyes.drivecopy.srvc;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -231,7 +232,9 @@ public class DriveSdoImpl implements DriveSdo {
 	}
 
 	@Override
-	public String getLastFolderId(TokenBO token, String[] folders) throws SdoException {
+	public String getLastFolderId(TokenBO token, String[] folders, boolean createIfNotFound) throws SdoException {
+
+		Drive service = getService(token);
 
 		try {
 
@@ -243,31 +246,52 @@ public class DriveSdoImpl implements DriveSdo {
 				// check folders existence
 				for (String currentFolder : folders) {
 
-					// compose current folder query
-					Files.List request = getService(token).files().list();
-					request.setQ(String.format("title = '%s' and trashed = false and mimeType = 'application/vnd.google-apps.folder' and '%s' in parents", currentFolder, lastParentId != null ? lastParentId : "root"));
-					request.setMaxResults(2);
+					try {
 
-					// execute query
-					logger.fine(String.format("Search remote folder with name '%s'", currentFolder));
-					FileList fs = request.execute();
+						// compose current folder query
+						Files.List request = service.files().list();
+						request.setQ(String.format("title = '%s' and trashed = false and mimeType = 'application/vnd.google-apps.folder' and '%s' in parents", currentFolder, lastParentId != null ? lastParentId : "root"));
+						request.setMaxResults(2);
 
-					// check no results
-					if (fs.getItems().isEmpty())
-						throw new FolderNotFoundException(String.format("No remote folder found with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
+						// execute query
+						logger.fine(String.format("Search remote folder with name '%s'", currentFolder));
+						FileList fs = request.execute();
 
-					// check multiple results
-					if (fs.getItems().size() > 1)
-						throw new SdoException(String.format("Multiple results for remote folder with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
+						// check no results
+						if (fs.getItems().isEmpty())
+							throw new FolderNotFoundException(String.format("No remote folder found with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
 
-					// check exact title
-					File folder = fs.getItems().get(0);
-					if (!folder.getTitle().equals(currentFolder))
-						throw new FolderNotFoundException(String.format("No remote folder found with exact name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
+						// check multiple results
+						if (fs.getItems().size() > 1)
+							throw new SdoException(String.format("Multiple results for remote folder with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
 
-					// set parent ID for next folder/file
-					lastParentId = folder.getId();
-					lastParentName = folder.getTitle();
+						// check exact title
+						File folder = fs.getItems().get(0);
+						if (!folder.getTitle().equals(currentFolder))
+							throw new FolderNotFoundException(String.format("No remote folder found with exact name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
+
+						// set parent ID for next folder/file
+						lastParentId = folder.getId();
+						lastParentName = folder.getTitle();
+
+					} catch (FolderNotFoundException ex) {
+
+						// eventually re-throw exception
+						if (!createIfNotFound)
+							throw ex;
+
+						// create folder
+						logger.fine(String.format("Create remote folder with name '%s'", currentFolder));
+						File folder = new File();
+						folder.setTitle(currentFolder);
+						folder.setMimeType("application/vnd.google-apps.folder");
+						folder.setParents(Arrays.asList(new ParentReference().setId(lastParentId != null ? lastParentId : "root")));
+						folder = service.files().insert(folder).execute();
+
+						// set parent ID for next folder/file
+						lastParentId = folder.getId();
+						lastParentName = folder.getTitle();
+					}
 				}
 			}
 
