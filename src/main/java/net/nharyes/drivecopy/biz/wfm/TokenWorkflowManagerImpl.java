@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Luca Zanconato
+ * Copyright 2012-2013 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,6 +85,9 @@ public class TokenWorkflowManagerImpl extends BaseWorkflowManager<TokenBO> imple
 			if (!config.containsKey(CLIENT_ID_KEY) || !config.containsKey(CLIENT_SECRET_KEY)) {
 
 				// request client data to user
+				System.out.println("Configuration file not found; generating a new one...");
+				System.out.println("(see https://github.com/Gherynos/DriveCopy/wiki/Setup for help)");
+				System.out.println();
 				System.out.println("Please insert CLIENT ID:");
 				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 				String clientId = br.readLine();

@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Luca Zanconato
+ * Copyright 2012-2013 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,9 +43,17 @@ import com.google.inject.Singleton;
 public class MainModule extends AbstractModule {
 
 	/*
-	 * Constants
+	 * Configuration file
 	 */
-	private final String configFile = "drivecopy.properties";
+	private String configFile;
+
+	public MainModule(String configFile) {
+
+		super();
+
+		// set configuration file
+		this.configFile = configFile;
+	}
 
 	@Provides
 	@Singleton
@@ -82,10 +90,10 @@ public class MainModule extends AbstractModule {
 
 		// File upload Progress Listener
 		bind(MediaHttpUploaderProgressListener.class).to(FileUploadProgressListener.class);
-		
+
 		// File download Progress Listener
 		bind(MediaHttpDownloaderProgressListener.class).to(FileDownloadProgressListener.class);
-		
+
 		// File Storage Workflow Manager
 		bind(FileStorageWorkflowManager.class).to(FileStorageWorkflowManagerImpl.class);
 

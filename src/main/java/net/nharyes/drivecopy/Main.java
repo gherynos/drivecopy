@@ -58,6 +58,7 @@ public class Main {
 	 */
 	private static final String DESCRIPTION = "Utility to download, replace and upload Google Drive binary files.";
 	private static final String JAR_FILE = "drivecopy.jar";
+	private static final String CONFIGURATION_FILE = "drivecopy.properties";
 
 	// command line options
 	private Options options = new Options();
@@ -147,7 +148,11 @@ public class Main {
 				fileBO.setForce(true);
 
 			// get Workflow Manager
-			Injector injector = Guice.createInjector(new MainModule());
+			Injector injector;
+			if (line.hasOption('C'))
+				injector = Guice.createInjector(new MainModule(line.getOptionValue('C')));
+			else
+				injector = Guice.createInjector(new MainModule(CONFIGURATION_FILE));
 			FileStorageWorkflowManager wfm = injector.getInstance(FileStorageWorkflowManager.class);
 
 			// execute workflow
@@ -277,6 +282,15 @@ public class Main {
 		forceCreation.setType(Boolean.class);
 		forceCreation.setDescription("forces the creation of the remote entry when replace is selected and the entry doesn't exist.");
 		options.addOption(forceCreation);
+
+		// settings file option
+		Option settings = OptionBuilder.create('C');
+		settings.setLongOpt("configuration");
+		settings.setArgs(1);
+		settings.setArgName("path");
+		settings.setType(String.class);
+		settings.setDescription(String.format("where path is the path of the configuration file. The default value is '%s' in the same directory.", CONFIGURATION_FILE));
+		options.addOption(settings);
 	}
 
 	public static void main(String[] args) {
