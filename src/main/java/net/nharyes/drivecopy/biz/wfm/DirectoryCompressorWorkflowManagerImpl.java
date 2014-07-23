@@ -114,7 +114,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 				// status
 				logger.info(String.format("Decompressing '%s'", entry.getName().substring(entry.getName().lastIndexOf(File.separator) + 1)));
 
-				// eventually create subdirectories for file
+				// in case create subdirectories for file
 				String f = directory.getDestinationDirectory().getAbsolutePath() + File.separator + entry.getName();
 				File fl = new File(f);
 				if (entry.getName().indexOf(File.separator) != -1) {

@@ -183,13 +183,13 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 				// replace file
 				entry.setFile(dirBO.getFile());
 
-				// eventually set ZIP MIME type
+				// in case set ZIP MIME type
 				if (entry.getMimeType() == null)
 					entry.setMimeType("application/zip");
 
 			} else {
 
-				// eventually set generic MIME type
+				// in case set generic MIME type
 				if (entry.getMimeType() == null)
 					entry.setMimeType("application/octet-stream");
 			}
@@ -201,7 +201,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			else
 				entry = driveSdo.updateEntry(token, entry);
 
-			// eventually check MD5 of the replaced entry
+			// in case check MD5 of the replaced entry
 			if (file.isCheckMd5()) {
 
 				// calculate MD5 of the local file/directory
@@ -217,14 +217,14 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 				logger.info("digests comparison OK");
 			}
 
-			// eventually delete temporary file
+			// in case delete temporary file
 			if (file.isDirectory()) {
 
 				logger.fine("Delete temporary file");
 				entry.getFile().delete();
 			}
 
-			// eventually delete file or directory
+			// in case delete file or directory
 			if (file.isDeleteAfter()) {
 
 				logger.info("Process file(s) for deletion...");
@@ -305,7 +305,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			// download entry
 			entry = driveSdo.downloadEntry(token, entry);
 
-			// eventually check MD5 of the downloaded entry
+			// in case check MD5 of the downloaded entry
 			if (file.isCheckMd5()) {
 
 				// calculate MD5 of the local file/directory

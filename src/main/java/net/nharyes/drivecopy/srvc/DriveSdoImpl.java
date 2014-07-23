@@ -162,7 +162,7 @@ public class DriveSdoImpl implements DriveSdo {
 			body.setTitle(entry.getName());
 			body.setMimeType(entry.getMimeType());
 
-			// eventually set parent
+			// in case set parent
 			if (parentId != null) {
 
 				ParentReference newParent = new ParentReference();
@@ -276,7 +276,7 @@ public class DriveSdoImpl implements DriveSdo {
 
 					} catch (FolderNotFoundException ex) {
 
-						// eventually re-throw exception
+						// in case re-throw exception
 						if (!createIfNotFound)
 							throw ex;
 
