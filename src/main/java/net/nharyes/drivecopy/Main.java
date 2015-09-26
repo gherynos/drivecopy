@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Luca Zanconato
+ * Copyright 2012-2015 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,11 @@
 package net.nharyes.drivecopy;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.nharyes.drivecopy.biz.bo.FileBO;
-import net.nharyes.drivecopy.biz.exc.WorkflowManagerException;
 import net.nharyes.drivecopy.biz.wfm.FileStorageWorkflowManager;
 import net.nharyes.drivecopy.log.SystemOutHandler;
 import net.nharyes.drivecopy.mod.MainModule;
@@ -46,7 +44,7 @@ public class Main {
 	/*
 	 * Version
 	 */
-	public static final String VERSION = "1.2.0";
+	public static final String VERSION = "1.2.1";
 
 	/*
 	 * Logger
@@ -176,26 +174,10 @@ public class Main {
 			// print help
 			HelpFormatter formatter = new HelpFormatter();
 			System.out.println("Drive Copy version " + VERSION);
-			System.out.println("Copyright 2012-2013 Luca Zanconato (luca.zanconato@nharyes.net)");
+			System.out.println("Copyright 2012-2015 Luca Zanconato (luca.zanconato@nharyes.net)");
 			System.out.println();
 			formatter.printHelp("java -jar " + JAR_FILE + " [OPTIONS] <MODE> [ENTRY]", DESCRIPTION + "\n", options, "\nMODE can be download/replace/upload.\nENTRY is the path of the entry in Google Drive (i.e. \"Test Folder/Another Folder/file.txt\"); if not set, the name of the local file/directory will be used.");
 			System.out.println();
-
-			// log exception
-			logger.log(Level.SEVERE, ex.getMessage(), ex);
-
-			// exit with error
-			System.exit(1);
-
-		} catch (WorkflowManagerException ex) {
-
-			// log exception
-			logger.log(Level.SEVERE, ex.getMessage(), ex);
-
-			// exit with error
-			System.exit(1);
-
-		} catch (IOException ex) {
 
 			// log exception
 			logger.log(Level.SEVERE, ex.getMessage(), ex);

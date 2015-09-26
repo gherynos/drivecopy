@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Luca Zanconato
+ * Copyright 2012-2015 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,6 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 	 */
 	private final int BUFFER = 2048;
 
-	@Override
 	public DirectoryBO handleWorkflow(DirectoryBO businessObject, int action) throws WorkflowManagerException {
 
 		switch (action) {
@@ -102,13 +101,14 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 			ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fin));
 
 			// create directory if not present
-			directory.getDestinationDirectory().mkdirs();
+			if (!directory.getDestinationDirectory().mkdirs())
+				throw new IOException(String.format("Unable to create directories structure '%s'", directory.getDestinationDirectory().getAbsolutePath()));
 
 			// process zip entries
 			int count;
 			byte data[] = new byte[BUFFER];
 			ZipEntry entry;
-			BufferedOutputStream dest = null;
+			BufferedOutputStream dest;
 			while ((entry = zis.getNextEntry()) != null) {
 
 				// status
@@ -117,9 +117,11 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 				// in case create subdirectories for file
 				String f = directory.getDestinationDirectory().getAbsolutePath() + File.separator + entry.getName();
 				File fl = new File(f);
-				if (entry.getName().indexOf(File.separator) != -1) {
+				if (entry.getName().contains(File.separator)) {
 
-					new File(f.substring(0, f.lastIndexOf(File.separator))).mkdirs();
+					File fDir = new File(f.substring(0, f.lastIndexOf(File.separator)));
+					if (!fDir.mkdirs())
+						throw new IOException(String.format("Unable to create directories structure '%s'", fDir.getAbsolutePath()));
 				}
 
 				// check if file can be written
@@ -129,7 +131,9 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 					logger.warning(String.format("Unable to decompress '%s'", fl.getAbsolutePath()));
 
 					// read entry from stream
-					while ((count = zis.read(data, 0, BUFFER)) != -1) {
+					while (zis.read(data, 0, BUFFER) != -1) {
+
+						data[0] = 0;
 					}
 
 				} else {
@@ -179,6 +183,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
 
 			// process all files contained
 			File[] files = f.listFiles();
+			assert files != null;
 			for (File fl : files)
 				processFile(fl, zout, path, notCompressed);
 

@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Luca Zanconato
+ * Copyright 2012-2015 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package net.nharyes.drivecopy.biz.wfm;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.Collections;
 
 import net.nharyes.drivecopy.biz.bo.TokenBO;
 import net.nharyes.drivecopy.biz.exc.WorkflowManagerException;
@@ -65,7 +65,6 @@ public class TokenWorkflowManagerImpl extends BaseWorkflowManager<TokenBO> imple
 		this.jsonFactory = jsonFactory;
 	}
 
-	@Override
 	public TokenBO handleWorkflow(TokenBO businessObject, int action) throws WorkflowManagerException {
 
 		switch (action) {
@@ -104,7 +103,7 @@ public class TokenWorkflowManagerImpl extends BaseWorkflowManager<TokenBO> imple
 			if (!config.containsKey(ACCESS_TOKEN_KEY) || !config.containsKey(REFRESH_TOKEN_KEY)) {
 
 				// request authorization to user
-				GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory, config.getString(CLIENT_ID_KEY), config.getString(CLIENT_SECRET_KEY), Arrays.asList(DriveScopes.DRIVE)).build();
+				GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory, config.getString(CLIENT_ID_KEY), config.getString(CLIENT_SECRET_KEY), Collections.singletonList(DriveScopes.DRIVE)).build();
 				String url = flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build();
 				System.out.println("Please open the following URL in your browser then type the authorization code:");
 				System.out.println("  " + url);
@@ -124,12 +123,7 @@ public class TokenWorkflowManagerImpl extends BaseWorkflowManager<TokenBO> imple
 			// return token
 			return new TokenBO(config.getString(CLIENT_ID_KEY), config.getString(CLIENT_SECRET_KEY), config.getString(ACCESS_TOKEN_KEY), config.getString(REFRESH_TOKEN_KEY));
 
-		} catch (IOException ex) {
-
-			// re-throw exception
-			throw new WorkflowManagerException(ex.getMessage(), ex);
-
-		} catch (ConfigurationException ex) {
+		} catch (IOException | ConfigurationException ex) {
 
 			// re-throw exception
 			throw new WorkflowManagerException(ex.getMessage(), ex);

@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Luca Zanconato
+ * Copyright 2012-2015 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,6 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 		this.tokenWorkflowManager = tokenWorkflowManager;
 	}
 
-	@Override
 	public FileBO handleWorkflow(FileBO businessObject, int action) throws WorkflowManagerException {
 
 		switch (action) {
@@ -159,6 +158,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			}
 
 			// set file property
+			assert entry != null;
 			entry.setFile(file.getFile());
 
 			// set MIME type property
@@ -221,7 +221,8 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			if (file.isDirectory()) {
 
 				logger.fine("Delete temporary file");
-				entry.getFile().delete();
+				if (!entry.getFile().delete())
+					logger.fine("Unable to delete temporary file...");
 			}
 
 			// in case delete file or directory
@@ -237,12 +238,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			fBO.setName(entry.getName());
 			return fBO;
 
-		} catch (SdoException ex) {
-
-			// re-throw exception
-			throw new WorkflowManagerException(ex.getMessage(), ex);
-
-		} catch (IOException ex) {
+		} catch (SdoException | IOException ex) {
 
 			// re-throw exception
 			throw new WorkflowManagerException(ex.getMessage(), ex);
@@ -334,7 +330,8 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
 				// delete downloaded file
 				logger.fine("Delete downloaded file");
-				entry.getFile().delete();
+				if (!entry.getFile().delete())
+					logger.fine("Unable to delete downloaded file...");
 
 				// return decompressed directory
 				FileBO fBO = new FileBO();
@@ -349,12 +346,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			fBO.setName(entry.getName());
 			return fBO;
 
-		} catch (SdoException ex) {
-
-			// re-throw exception
-			throw new WorkflowManagerException(ex.getMessage(), ex);
-
-		} catch (IOException ex) {
+		} catch (SdoException | IOException ex) {
 
 			// re-throw exception
 			throw new WorkflowManagerException(ex.getMessage(), ex);
@@ -383,12 +375,14 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			// process all files contained
 			logger.fine(String.format("Process directory '%s' for deletion", f.getAbsolutePath()));
 			File[] files = f.listFiles();
+			assert files != null;
 			for (File fl : files)
 				processFileForDeletion(fl, notCompressed);
 		}
 
 		// delete file/directory
 		logger.fine(String.format("Delete file/directory '%s'", f.getAbsolutePath()));
-		f.delete();
+		if (!f.delete())
+			logger.fine("Unable to delete file/directory...");
 	}
 }

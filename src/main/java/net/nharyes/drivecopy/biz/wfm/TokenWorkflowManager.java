@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Luca Zanconato
+ * Copyright 2012-2015 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,5 +23,5 @@ public interface TokenWorkflowManager extends WorkflowManager<TokenBO> {
 	/*
 	 * Workflow actions
 	 */
-	public static int ACTION_GET = 0;
+	int ACTION_GET = 0;
 }

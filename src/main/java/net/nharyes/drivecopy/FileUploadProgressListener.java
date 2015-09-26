@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Luca Zanconato
+ * Copyright 2012-2015 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ public class FileUploadProgressListener implements MediaHttpUploaderProgressList
 	 */
 	protected final Logger logger = Logger.getLogger(getClass().getName());
 
-	@Override
 	public void progressChanged(MediaHttpUploader uploader) throws IOException {
 
 		switch (uploader.getUploadState()) {

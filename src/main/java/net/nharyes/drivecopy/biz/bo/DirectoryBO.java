@@ -28,7 +28,7 @@ public class DirectoryBO implements BusinessObject {
 	
 	private int level;
 	
-	private List<File> notCompressed = new ArrayList<File>();
+	private List<File> notCompressed = new ArrayList<>();
 
 	public File getFile() {
 		

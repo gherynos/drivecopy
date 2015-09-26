@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Luca Zanconato
+ * Copyright 2012-2015 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,13 @@ package net.nharyes.drivecopy.srvc;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.services.drive.DriveRequest;
 import net.nharyes.drivecopy.biz.bo.EntryBO;
 import net.nharyes.drivecopy.biz.bo.TokenBO;
 import net.nharyes.drivecopy.srvc.exc.FolderNotFoundException;
@@ -88,9 +91,9 @@ public class DriveSdoImpl implements DriveSdo {
 	private Drive getService(TokenBO token) {
 
 		final GoogleCredential credential = new GoogleCredential.Builder().setClientSecrets(token.getClientId(), token.getClientSecret()).setJsonFactory(jsonFactory).setTransport(httpTransport).build().setRefreshToken(token.getRefreshToken()).setAccessToken(token.getAccessToken());
-		Drive out = new Drive.Builder(httpTransport, jsonFactory, new HttpRequestInitializer() {
 
-			@Override
+		return new Drive.Builder(httpTransport, jsonFactory, new HttpRequestInitializer() {
+
 			public void initialize(HttpRequest httpRequest) {
 
 				try {
@@ -109,11 +112,36 @@ public class DriveSdoImpl implements DriveSdo {
 				}
 			}
 		}).setApplicationName("DriveCopy").build();
-
-		return out;
 	}
 
-	@Override
+	private <T> T executeWithExponentialBackoff(DriveRequest<T> req) throws IOException, InterruptedException {
+
+		Random randomGenerator = new Random();
+
+		for (int n = 0; n < 5; ++n) {
+
+			try {
+
+				return req.execute();
+
+			} catch (GoogleJsonResponseException e) {
+
+				if (e.getStatusCode() == 503 || e.getStatusCode() == 500 || (e.getStatusCode() == 403 && (e.getDetails().getErrors().get(0).getReason().equals("rateLimitExceeded") || e.getDetails().getErrors().get(0).getReason().equals("userRateLimitExceeded")))) {
+
+					// apply exponential backoff.
+					Thread.sleep((1 << n) * 1000 + randomGenerator.nextInt(1001));
+
+				} else {
+
+					// other error, re-throw.
+					throw e;
+				}
+			}
+		}
+
+		throw new IOException("There has been an error, the request never succeeded.");
+	}
+
 	public EntryBO downloadEntry(TokenBO token, EntryBO entry) throws SdoException {
 
 		try {
@@ -124,7 +152,7 @@ public class DriveSdoImpl implements DriveSdo {
 			MediaHttpDownloader downloader = new MediaHttpDownloader(httpTransport, service.getRequestFactory().getInitializer());
 			downloader.setDirectDownloadEnabled(false);
 			downloader.setProgressListener(fileDownloadProgressListener);
-			File file = get.execute();
+			File file = executeWithExponentialBackoff(get);
 
 			// check download URL and size
 			if (file.getDownloadUrl() != null && file.getDownloadUrl().length() > 0) {
@@ -145,14 +173,13 @@ public class DriveSdoImpl implements DriveSdo {
 				throw new ItemNotFoundException(String.format("Remote file with id '%s' doesn't have any content stored on Drive", entry.getId()));
 			}
 
-		} catch (IOException ex) {
+		} catch (IOException | InterruptedException ex) {
 
 			// re-throw exception
 			throw new SdoException(ex.getMessage(), ex);
 		}
 	}
 
-	@Override
 	public EntryBO uploadEntry(TokenBO token, EntryBO entry, String parentId) throws SdoException {
 
 		try {
@@ -179,7 +206,7 @@ public class DriveSdoImpl implements DriveSdo {
 			MediaHttpUploader uploader = insert.getMediaHttpUploader();
 			uploader.setDirectUploadEnabled(false);
 			uploader.setProgressListener(fileUploadProgressListener);
-			File file = insert.execute();
+			File file = executeWithExponentialBackoff(insert);
 
 			// compose output entry
 			EntryBO entryBO = new EntryBO();
@@ -188,21 +215,20 @@ public class DriveSdoImpl implements DriveSdo {
 			entryBO.setMd5Sum(file.getMd5Checksum());
 			return entryBO;
 
-		} catch (IOException ex) {
+		} catch (IOException | InterruptedException ex) {
 
 			// re-throw exception
 			throw new SdoException(ex.getMessage(), ex);
 		}
 	}
 
-	@Override
 	public EntryBO updateEntry(TokenBO token, EntryBO entry) throws SdoException {
 
 		try {
 
 			// get file
 			Drive service = getService(token);
-			File file = service.files().get(entry.getId()).execute();
+			File file = executeWithExponentialBackoff(service.files().get(entry.getId()));
 
 			// update file content
 			FileContent mediaContent = new FileContent(entry.getMimeType(), entry.getFile());
@@ -214,7 +240,7 @@ public class DriveSdoImpl implements DriveSdo {
 			MediaHttpUploader uploader = update.getMediaHttpUploader();
 			uploader.setDirectUploadEnabled(false);
 			uploader.setProgressListener(fileUploadProgressListener);
-			File updatedFile = update.execute();
+			File updatedFile = executeWithExponentialBackoff(update);
 
 			// compose output entry
 			EntryBO docBO = new EntryBO();
@@ -224,14 +250,13 @@ public class DriveSdoImpl implements DriveSdo {
 			docBO.setMd5Sum(updatedFile.getMd5Checksum());
 			return docBO;
 
-		} catch (IOException ex) {
+		} catch (IOException | InterruptedException ex) {
 
 			// re-throw exception
 			throw new SdoException(ex.getMessage(), ex);
 		}
 	}
 
-	@Override
 	public String getLastFolderId(TokenBO token, String[] folders, boolean createIfNotFound) throws SdoException {
 
 		Drive service = getService(token);
@@ -255,7 +280,7 @@ public class DriveSdoImpl implements DriveSdo {
 
 						// execute query
 						logger.fine(String.format("Search remote folder with name '%s'", currentFolder));
-						FileList fs = request.execute();
+						FileList fs = executeWithExponentialBackoff(request);
 
 						// check no results
 						if (fs.getItems().isEmpty())
@@ -285,8 +310,8 @@ public class DriveSdoImpl implements DriveSdo {
 						File folder = new File();
 						folder.setTitle(currentFolder);
 						folder.setMimeType("application/vnd.google-apps.folder");
-						folder.setParents(Arrays.asList(new ParentReference().setId(lastParentId != null ? lastParentId : "root")));
-						folder = service.files().insert(folder).execute();
+						folder.setParents(Collections.singletonList(new ParentReference().setId(lastParentId != null ? lastParentId : "root")));
+						folder = executeWithExponentialBackoff(service.files().insert(folder));
 
 						// set parent ID for next folder/file
 						lastParentId = folder.getId();
@@ -297,14 +322,13 @@ public class DriveSdoImpl implements DriveSdo {
 
 			return lastParentId;
 
-		} catch (IOException ex) {
+		} catch (IOException | InterruptedException ex) {
 
 			// re-throw exception
 			throw new SdoException(ex.getMessage(), ex);
 		}
 	}
 
-	@Override
 	public EntryBO searchEntry(TokenBO token, String name, String parentId) throws SdoException {
 
 		try {
@@ -316,7 +340,7 @@ public class DriveSdoImpl implements DriveSdo {
 
 			// execute query
 			logger.fine(String.format("Search entry with name '%s'", name));
-			FileList files = request.execute();
+			FileList files = executeWithExponentialBackoff(request);
 
 			// check no results
 			if (files.getItems().isEmpty())
@@ -337,7 +361,7 @@ public class DriveSdoImpl implements DriveSdo {
 			entry.setName(file.getTitle());
 			return entry;
 
-		} catch (IOException ex) {
+		} catch (IOException | InterruptedException ex) {
 
 			// re-throw exception
 			throw new SdoException(ex.getMessage(), ex);

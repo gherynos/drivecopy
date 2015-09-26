@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Luca Zanconato
+ * Copyright 2012-2015 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,6 @@ public interface DirectoryCompressorWorkflowManager extends WorkflowManager<Dire
 	/*
 	 * Workflow actions
 	 */
-	public static int ACTION_COMPRESS = 0;
-	public static int ACTION_DECOMPRESS = 1;
+	int ACTION_COMPRESS = 0;
+	int ACTION_DECOMPRESS = 1;
 }
