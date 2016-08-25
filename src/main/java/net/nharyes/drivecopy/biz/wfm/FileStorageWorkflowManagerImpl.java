@@ -101,6 +101,21 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 		return filePath;
 	}
 
+	private void checkMD5(EntryBO entry) throws IOException, WorkflowManagerException {
+
+		// calculate MD5 of the local file/directory
+		logger.info("calculate the MD5 summary of the file...");
+		byte[] digest = Files.hash(entry.getFile(), Hashing.md5()).asBytes();
+		String sDigest = new BigInteger(1, digest).toString(16);
+		logger.fine(String.format("digest of the file: %s", sDigest));
+		logger.fine(String.format("digest of the entry: %s", entry.getMd5Sum()));
+
+		// compare digests
+		if (!sDigest.equalsIgnoreCase(entry.getMd5Sum()))
+			throw new WorkflowManagerException("wrong digest!");
+		logger.info("digests comparison OK");
+	}
+
 	private FileBO upsert(FileBO file, boolean upload) throws WorkflowManagerException {
 
 		try {
@@ -119,11 +134,11 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 				logger.warning("force option ignored");
 
 			EntryBO entry = null;
-			String parentId = null;
+			String parentId = DriveSdo.DRIVE_ROOT_FOLDER_ID;
 			try {
 
 				// process folders and get parent ID
-				parentId = driveSdo.getLastFolderId(token, extractFolders(file.getName()), file.isCreateFolders());
+				parentId = driveSdo.getLastFolderId(token, extractFolders(file.getName()), DriveSdo.DRIVE_ROOT_FOLDER_ID, file.isCreateFolders());
 
 				// search entry
 				entry = driveSdo.searchEntry(token, extractFileName(file.getName()), parentId);
@@ -202,20 +217,8 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 				entry = driveSdo.updateEntry(token, entry);
 
 			// in case check MD5 of the replaced entry
-			if (file.isCheckMd5()) {
-
-				// calculate MD5 of the local file/directory
-				logger.info("calculate the MD5 summary of the file...");
-				byte[] digest = Files.hash(entry.getFile(), Hashing.md5()).asBytes();
-				String sDigest = new BigInteger(1, digest).toString(16);
-				logger.fine(String.format("digest of the file: %s", sDigest));
-				logger.fine(String.format("digest of the entry: %s", entry.getMd5Sum()));
-
-				// compare digests
-				if (!sDigest.equalsIgnoreCase(entry.getMd5Sum()))
-					throw new WorkflowManagerException("wrong digest!");
-				logger.info("digests comparison OK");
-			}
+			if (file.isCheckMd5())
+				checkMD5(entry);
 
 			// in case delete temporary file
 			if (file.isDirectory()) {
@@ -277,7 +280,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 				logger.warning("Create folders option ignored");
 
 			// process folders and get parent ID
-			String parentId = driveSdo.getLastFolderId(token, extractFolders(file.getName()), false);
+			String parentId = driveSdo.getLastFolderId(token, extractFolders(file.getName()), DriveSdo.DRIVE_ROOT_FOLDER_ID, false);
 
 			// search entry
 			EntryBO entry = driveSdo.searchEntry(token, extractFileName(file.getName()), parentId);
@@ -302,20 +305,8 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 			entry = driveSdo.downloadEntry(token, entry);
 
 			// in case check MD5 of the downloaded entry
-			if (file.isCheckMd5()) {
-
-				// calculate MD5 of the local file/directory
-				logger.info("calculate the MD5 summary of the file...");
-				byte[] digest = Files.hash(entry.getFile(), Hashing.md5()).asBytes();
-				String sDigest = new BigInteger(1, digest).toString(16);
-				logger.fine(String.format("digest of the file: %s", sDigest));
-				logger.fine(String.format("digest of the entry: %s", entry.getMd5Sum()));
-
-				// compare digests
-				if (!sDigest.equalsIgnoreCase(entry.getMd5Sum()))
-					throw new WorkflowManagerException("wrong digest!");
-				logger.info("digests comparison OK");
-			}
+			if (file.isCheckMd5())
+				checkMD5(entry);
 
 			// check directory
 			if (file.isDirectory()) {

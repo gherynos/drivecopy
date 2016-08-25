@@ -22,6 +22,11 @@ import net.nharyes.drivecopy.srvc.exc.SdoException;
 
 public interface DriveSdo {
 
+	/*
+	 * Google Drive root folder ID
+	 */
+	String DRIVE_ROOT_FOLDER_ID = "root";
+
 	EntryBO downloadEntry(TokenBO token, EntryBO entry) throws SdoException;
 
 	EntryBO uploadEntry(TokenBO token, EntryBO entry, String parentId) throws SdoException;
@@ -30,5 +35,5 @@ public interface DriveSdo {
 
 	EntryBO searchEntry(TokenBO token, String name, String parentId) throws SdoException;
 
-	String getLastFolderId(TokenBO token, String[] folders, boolean createIfNotFound) throws SdoException;
+	String getLastFolderId(TokenBO token, String[] folders, String rootId, boolean createIfNotFound) throws SdoException;
 }

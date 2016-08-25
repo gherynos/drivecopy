@@ -4,7 +4,7 @@
 
 	<groupId>net.nharyes</groupId>
 	<artifactId>drivecopy</artifactId>
-	<version>1.2.1</version>
+	<version>1.2.2</version>
 	<packaging>jar</packaging>
 
 	<name>DriveCopy</name>
@@ -65,17 +65,17 @@
 		<dependency>
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-drive</artifactId>
-			<version>v2-rev186-1.20.0</version>
+			<version>v2-rev231-1.22.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.http-client</groupId>
 			<artifactId>google-http-client</artifactId>
-			<version>1.20.0</version>
+			<version>1.22.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.http-client</groupId>
 			<artifactId>google-http-client-jackson2</artifactId>
-			<version>1.20.0</version>
+			<version>1.22.0</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-configuration</groupId>

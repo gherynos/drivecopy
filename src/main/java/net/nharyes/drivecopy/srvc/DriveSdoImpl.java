@@ -16,6 +16,32 @@
 
 package net.nharyes.drivecopy.srvc;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.googleapis.media.MediaHttpDownloader;
+import com.google.api.client.googleapis.media.MediaHttpDownloaderProgressListener;
+import com.google.api.client.googleapis.media.MediaHttpUploader;
+import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
+import com.google.api.client.http.*;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.Drive.Files.Get;
+import com.google.api.services.drive.Drive.Files.Insert;
+import com.google.api.services.drive.Drive.Files.Update;
+import com.google.api.services.drive.DriveRequest;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.ParentReference;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.nharyes.drivecopy.biz.bo.EntryBO;
+import net.nharyes.drivecopy.biz.bo.TokenBO;
+import net.nharyes.drivecopy.srvc.exc.FolderNotFoundException;
+import net.nharyes.drivecopy.srvc.exc.ItemNotFoundException;
+import net.nharyes.drivecopy.srvc.exc.SdoException;
+
+import javax.annotation.Nonnull;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,36 +49,6 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.services.drive.DriveRequest;
-import net.nharyes.drivecopy.biz.bo.EntryBO;
-import net.nharyes.drivecopy.biz.bo.TokenBO;
-import net.nharyes.drivecopy.srvc.exc.FolderNotFoundException;
-import net.nharyes.drivecopy.srvc.exc.ItemNotFoundException;
-import net.nharyes.drivecopy.srvc.exc.SdoException;
-
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.media.MediaHttpDownloader;
-import com.google.api.client.googleapis.media.MediaHttpDownloaderProgressListener;
-import com.google.api.client.googleapis.media.MediaHttpUploader;
-import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
-import com.google.api.client.http.FileContent;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.Drive.Files;
-import com.google.api.services.drive.Drive.Files.Get;
-import com.google.api.services.drive.Drive.Files.Insert;
-import com.google.api.services.drive.Drive.Files.Update;
-import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
-import com.google.api.services.drive.model.ParentReference;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 @Singleton
 public class DriveSdoImpl implements DriveSdo {
@@ -88,7 +84,7 @@ public class DriveSdoImpl implements DriveSdo {
 		this.fileDownloadProgressListener = fileDownloadProgressListener;
 	}
 
-	private Drive getService(TokenBO token) {
+	private Drive getService(@Nonnull TokenBO token) {
 
 		final GoogleCredential credential = new GoogleCredential.Builder().setClientSecrets(token.getClientId(), token.getClientSecret()).setJsonFactory(jsonFactory).setTransport(httpTransport).build().setRefreshToken(token.getRefreshToken()).setAccessToken(token.getAccessToken());
 
@@ -142,7 +138,7 @@ public class DriveSdoImpl implements DriveSdo {
 		throw new IOException("There has been an error, the request never succeeded.");
 	}
 
-	public EntryBO downloadEntry(TokenBO token, EntryBO entry) throws SdoException {
+	public EntryBO downloadEntry(@Nonnull TokenBO token, @Nonnull EntryBO entry) throws SdoException {
 
 		try {
 
@@ -180,7 +176,7 @@ public class DriveSdoImpl implements DriveSdo {
 		}
 	}
 
-	public EntryBO uploadEntry(TokenBO token, EntryBO entry, String parentId) throws SdoException {
+	public EntryBO uploadEntry(@Nonnull TokenBO token, @Nonnull EntryBO entry, @Nonnull String parentId) throws SdoException {
 
 		try {
 
@@ -189,14 +185,11 @@ public class DriveSdoImpl implements DriveSdo {
 			body.setTitle(entry.getName());
 			body.setMimeType(entry.getMimeType());
 
-			// in case set parent
-			if (parentId != null) {
-
-				ParentReference newParent = new ParentReference();
-				newParent.setId(parentId);
-				body.setParents(new ArrayList<ParentReference>());
-				body.getParents().add(newParent);
-			}
+			// set parent
+            ParentReference newParent = new ParentReference();
+            newParent.setId(parentId);
+            body.setParents(new ArrayList<ParentReference>());
+            body.getParents().add(newParent);
 
 			// set content
 			FileContent mediaContent = new FileContent(entry.getMimeType(), entry.getFile());
@@ -222,7 +215,7 @@ public class DriveSdoImpl implements DriveSdo {
 		}
 	}
 
-	public EntryBO updateEntry(TokenBO token, EntryBO entry) throws SdoException {
+	public EntryBO updateEntry(@Nonnull TokenBO token, @Nonnull EntryBO entry) throws SdoException {
 
 		try {
 
@@ -257,14 +250,14 @@ public class DriveSdoImpl implements DriveSdo {
 		}
 	}
 
-	public String getLastFolderId(TokenBO token, String[] folders, boolean createIfNotFound) throws SdoException {
+	public String getLastFolderId(@Nonnull TokenBO token, String[] folders, @Nonnull String rootId, boolean createIfNotFound) throws SdoException {
 
 		Drive service = getService(token);
 
 		try {
 
 			// check folders
-			String lastParentId = null;
+			String lastParentId = rootId;
 			String lastParentName = null;
 			if (folders != null) {
 
@@ -275,7 +268,7 @@ public class DriveSdoImpl implements DriveSdo {
 
 						// compose current folder query
 						Files.List request = service.files().list();
-						request.setQ(String.format("title = '%s' and trashed = false and mimeType = 'application/vnd.google-apps.folder' and '%s' in parents", currentFolder, lastParentId != null ? lastParentId : "root"));
+						request.setQ(String.format("title = '%s' and trashed = false and mimeType = 'application/vnd.google-apps.folder' and '%s' in parents", currentFolder, lastParentId));
 						request.setMaxResults(2);
 
 						// execute query
@@ -329,13 +322,13 @@ public class DriveSdoImpl implements DriveSdo {
 		}
 	}
 
-	public EntryBO searchEntry(TokenBO token, String name, String parentId) throws SdoException {
+	public EntryBO searchEntry(@Nonnull TokenBO token, @Nonnull String name, @Nonnull String parentId) throws SdoException {
 
 		try {
 
 			// compose list query
 			Files.List request = getService(token).files().list();
-			request.setQ(String.format("title = '%s' and trashed = false and mimeType != 'application/vnd.google-apps.folder' and '%s' in parents", name, parentId != null ? parentId : "root"));
+			request.setQ(String.format("title = '%s' and trashed = false and mimeType != 'application/vnd.google-apps.folder' and '%s' in parents", name, parentId));
 			request.setMaxResults(2);
 
 			// execute query
