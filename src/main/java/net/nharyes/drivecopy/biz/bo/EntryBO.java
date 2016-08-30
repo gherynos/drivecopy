@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,71 +20,71 @@ import java.io.File;
 
 public class EntryBO implements BusinessObject {
 
-	private String id;
-	
-	private File file;
-	
-	private String name;
-	
-	private String mimeType;
-	
-	private boolean skipRevision;
-	
-	private String md5Sum;
+    private String id;
 
-	public String getId() {
-		
-		return id;
-	}
+    private File file;
 
-	public void setId(String id) {
-		
-		this.id = id;
-	}
+    private String name;
 
-	public File getFile() {
-		return file;
-	}
+    private String mimeType;
 
-	public void setFile(File file) {
-		this.file = file;
-	}
+    private boolean skipRevision;
 
-	public String getName() {
-		return name;
-	}
+    private String md5Sum;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getId() {
 
-	public String getMimeType() {
+        return id;
+    }
 
-		return mimeType;
-	}
+    public void setId(String id) {
 
-	public void setMimeType(String mimeType) {
+        this.id = id;
+    }
 
-		this.mimeType = mimeType;
-	}
+    public File getFile() {
+        return file;
+    }
 
-	public boolean isSkipRevision() {
+    public void setFile(File file) {
+        this.file = file;
+    }
 
-		return skipRevision;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setSkipRevision(boolean skipRevision) {
+    public void setName(String name) {
+        this.name = name;
+    }
 
-		this.skipRevision = skipRevision;
-	}
+    public String getMimeType() {
 
-	public String getMd5Sum() {
+        return mimeType;
+    }
 
-		return md5Sum;
-	}
+    public void setMimeType(String mimeType) {
 
-	public void setMd5Sum(String md5Sum) {
+        this.mimeType = mimeType;
+    }
 
-		this.md5Sum = md5Sum;
-	}
+    public boolean isSkipRevision() {
+
+        return skipRevision;
+    }
+
+    public void setSkipRevision(boolean skipRevision) {
+
+        this.skipRevision = skipRevision;
+    }
+
+    public String getMd5Sum() {
+
+        return md5Sum;
+    }
+
+    public void setMd5Sum(String md5Sum) {
+
+        this.md5Sum = md5Sum;
+    }
 }

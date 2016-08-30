@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012-2013 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,20 +16,6 @@
 
 package net.nharyes.drivecopy.mod;
 
-import net.nharyes.drivecopy.FileDownloadProgressListener;
-import net.nharyes.drivecopy.FileUploadProgressListener;
-import net.nharyes.drivecopy.biz.wfm.DirectoryCompressorWorkflowManager;
-import net.nharyes.drivecopy.biz.wfm.DirectoryCompressorWorkflowManagerImpl;
-import net.nharyes.drivecopy.biz.wfm.FileStorageWorkflowManager;
-import net.nharyes.drivecopy.biz.wfm.FileStorageWorkflowManagerImpl;
-import net.nharyes.drivecopy.biz.wfm.TokenWorkflowManager;
-import net.nharyes.drivecopy.biz.wfm.TokenWorkflowManagerImpl;
-import net.nharyes.drivecopy.srvc.DriveSdo;
-import net.nharyes.drivecopy.srvc.DriveSdoImpl;
-
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-
 import com.google.api.client.googleapis.media.MediaHttpDownloaderProgressListener;
 import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.google.api.client.http.HttpTransport;
@@ -39,68 +25,75 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import net.nharyes.drivecopy.FileDownloadProgressListener;
+import net.nharyes.drivecopy.FileUploadProgressListener;
+import net.nharyes.drivecopy.biz.wfm.*;
+import net.nharyes.drivecopy.srvc.DriveSdo;
+import net.nharyes.drivecopy.srvc.DriveSdoImpl;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 public class MainModule extends AbstractModule {
 
-	/*
-	 * Configuration file
-	 */
-	private String configFile;
+    /*
+     * Configuration file
+     */
+    private String configFile;
 
-	public MainModule(String configFile) {
+    public MainModule(String configFile) {
 
-		super();
+        super();
 
-		// set configuration file
-		this.configFile = configFile;
-	}
+        // set configuration file
+        this.configFile = configFile;
+    }
 
-	@Provides
-	@Singleton
-	private PropertiesConfiguration providePropertiesConfiguration() {
+    @Provides
+    @Singleton
+    private PropertiesConfiguration providePropertiesConfiguration() {
 
-		PropertiesConfiguration config;
+        PropertiesConfiguration config;
 
-		try {
+        try {
 
-			// load configuration from file
-			config = new PropertiesConfiguration(configFile);
+            // load configuration from file
+            config = new PropertiesConfiguration(configFile);
 
-		} catch (ConfigurationException ex) {
+        } catch (ConfigurationException ex) {
 
-			// create empty configuration
-			config = new PropertiesConfiguration();
-			config.setFileName(configFile);
-		}
+            // create empty configuration
+            config = new PropertiesConfiguration();
+            config.setFileName(configFile);
+        }
 
-		return config;
-	}
+        return config;
+    }
 
-	@Override
-	protected void configure() {
+    @Override
+    protected void configure() {
 
-		// HTTP transport
-		bind(HttpTransport.class).to(NetHttpTransport.class).in(Singleton.class);
+        // HTTP transport
+        bind(HttpTransport.class).to(NetHttpTransport.class).in(Singleton.class);
 
-		// JSON factory
-		bind(JsonFactory.class).to(JacksonFactory.class).in(Singleton.class);
+        // JSON factory
+        bind(JsonFactory.class).to(JacksonFactory.class).in(Singleton.class);
 
-		// Drive SDO
-		bind(DriveSdo.class).to(DriveSdoImpl.class);
+        // Drive SDO
+        bind(DriveSdo.class).to(DriveSdoImpl.class);
 
-		// File upload Progress Listener
-		bind(MediaHttpUploaderProgressListener.class).to(FileUploadProgressListener.class);
+        // File upload Progress Listener
+        bind(MediaHttpUploaderProgressListener.class).to(FileUploadProgressListener.class);
 
-		// File download Progress Listener
-		bind(MediaHttpDownloaderProgressListener.class).to(FileDownloadProgressListener.class);
+        // File download Progress Listener
+        bind(MediaHttpDownloaderProgressListener.class).to(FileDownloadProgressListener.class);
 
-		// File Storage Workflow Manager
-		bind(FileStorageWorkflowManager.class).to(FileStorageWorkflowManagerImpl.class);
+        // File Storage Workflow Manager
+        bind(FileStorageWorkflowManager.class).to(FileStorageWorkflowManagerImpl.class);
 
-		// Directory Compressor Workflow Manager
-		bind(DirectoryCompressorWorkflowManager.class).to(DirectoryCompressorWorkflowManagerImpl.class);
+        // Directory Compressor Workflow Manager
+        bind(DirectoryCompressorWorkflowManager.class).to(DirectoryCompressorWorkflowManagerImpl.class);
 
-		// Token Workflow Manager
-		bind(TokenWorkflowManager.class).to(TokenWorkflowManagerImpl.class);
-	}
+        // Token Workflow Manager
+        bind(TokenWorkflowManager.class).to(TokenWorkflowManagerImpl.class);
+    }
 }

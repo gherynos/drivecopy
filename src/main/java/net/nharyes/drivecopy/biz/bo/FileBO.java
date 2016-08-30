@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012-2013 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,123 +20,123 @@ import java.io.File;
 
 public class FileBO implements BusinessObject {
 
-	private File file;
+    private File file;
 
-	private String name;
+    private String name;
 
-	private int compressionLevel;
+    private int compressionLevel;
 
-	private boolean isDirectory;
+    private boolean isDirectory;
 
-	private boolean deleteAfter;
+    private boolean deleteAfter;
 
-	private String mimeType;
+    private String mimeType;
 
-	private boolean skipRevision;
+    private boolean skipRevision;
 
-	private boolean checkMd5;
+    private boolean checkMd5;
 
-	private boolean force;
-	
-	private boolean createFolders;
+    private boolean force;
 
-	public File getFile() {
+    private boolean createFolders;
 
-		return file;
-	}
+    public File getFile() {
 
-	public void setFile(File file) {
+        return file;
+    }
 
-		this.file = file;
-	}
+    public void setFile(File file) {
 
-	public String getName() {
+        this.file = file;
+    }
 
-		return name;
-	}
+    public String getName() {
 
-	public void setName(String name) {
+        return name;
+    }
 
-		this.name = name;
-	}
+    public void setName(String name) {
 
-	public int getCompressionLevel() {
+        this.name = name;
+    }
 
-		return compressionLevel;
-	}
+    public int getCompressionLevel() {
 
-	public void setCompressionLevel(int compressionLevel) {
+        return compressionLevel;
+    }
 
-		this.compressionLevel = compressionLevel;
-	}
+    public void setCompressionLevel(int compressionLevel) {
 
-	public boolean isDirectory() {
+        this.compressionLevel = compressionLevel;
+    }
 
-		return isDirectory;
-	}
+    public boolean isDirectory() {
 
-	public void setDirectory(boolean isDirectory) {
+        return isDirectory;
+    }
 
-		this.isDirectory = isDirectory;
-	}
+    public void setDirectory(boolean isDirectory) {
 
-	public boolean isDeleteAfter() {
+        this.isDirectory = isDirectory;
+    }
 
-		return deleteAfter;
-	}
+    public boolean isDeleteAfter() {
 
-	public void setDeleteAfter(boolean deleteAfter) {
+        return deleteAfter;
+    }
 
-		this.deleteAfter = deleteAfter;
-	}
+    public void setDeleteAfter(boolean deleteAfter) {
 
-	public String getMimeType() {
+        this.deleteAfter = deleteAfter;
+    }
 
-		return mimeType;
-	}
+    public String getMimeType() {
 
-	public void setMimeType(String mimeType) {
+        return mimeType;
+    }
 
-		this.mimeType = mimeType;
-	}
+    public void setMimeType(String mimeType) {
 
-	public boolean isSkipRevision() {
+        this.mimeType = mimeType;
+    }
 
-		return skipRevision;
-	}
+    public boolean isSkipRevision() {
 
-	public void setSkipRevision(boolean skipRevision) {
+        return skipRevision;
+    }
 
-		this.skipRevision = skipRevision;
-	}
+    public void setSkipRevision(boolean skipRevision) {
 
-	public boolean isCheckMd5() {
+        this.skipRevision = skipRevision;
+    }
 
-		return checkMd5;
-	}
+    public boolean isCheckMd5() {
 
-	public void setCheckMd5(boolean checkMd5) {
+        return checkMd5;
+    }
 
-		this.checkMd5 = checkMd5;
-	}
+    public void setCheckMd5(boolean checkMd5) {
 
-	public boolean isForce() {
+        this.checkMd5 = checkMd5;
+    }
 
-		return force;
-	}
+    public boolean isForce() {
 
-	public void setForce(boolean force) {
+        return force;
+    }
 
-		this.force = force;
-	}
+    public void setForce(boolean force) {
 
-	public boolean isCreateFolders() {
+        this.force = force;
+    }
 
-		return createFolders;
-	}
+    public boolean isCreateFolders() {
 
-	public void setCreateFolders(boolean createFolders) {
+        return createFolders;
+    }
 
-		this.createFolders = createFolders;
-	}
+    public void setCreateFolders(boolean createFolders) {
+
+        this.createFolders = createFolders;
+    }
 }

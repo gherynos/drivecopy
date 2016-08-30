@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012-2015 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,311 +53,311 @@ import java.util.logging.Logger;
 @Singleton
 public class DriveSdoImpl implements DriveSdo {
 
-	/*
-	 * Logger
-	 */
-	protected final Logger logger = Logger.getLogger(getClass().getName());
+    /*
+     * Logger
+     */
+    protected final Logger logger = Logger.getLogger(getClass().getName());
 
-	/*
-	 * HTTP Request read and connect timeout
-	 */
-	private static final int HTTP_REQUEST_TIMEOUT = 3 * 600000;
+    /*
+     * HTTP Request read and connect timeout
+     */
+    protected static final int HTTP_REQUEST_TIMEOUT = 3 * 600000;
 
-	// HTTP transport
-	private HttpTransport httpTransport;
+    // HTTP transport
+    protected HttpTransport httpTransport;
 
-	// JSON factory
-	private JsonFactory jsonFactory;
+    // JSON factory
+    protected JsonFactory jsonFactory;
 
-	// File upload progress listener
-	private MediaHttpUploaderProgressListener fileUploadProgressListener;
+    // File upload progress listener
+    protected MediaHttpUploaderProgressListener fileUploadProgressListener;
 
-	// File download progress listener
-	private MediaHttpDownloaderProgressListener fileDownloadProgressListener;
+    // File download progress listener
+    protected MediaHttpDownloaderProgressListener fileDownloadProgressListener;
 
-	@Inject
-	public DriveSdoImpl(HttpTransport httpTransport, JsonFactory jsonFactory, MediaHttpUploaderProgressListener fileUploadProgressListener, MediaHttpDownloaderProgressListener fileDownloadProgressListener) {
+    @Inject
+    public DriveSdoImpl(HttpTransport httpTransport, JsonFactory jsonFactory, MediaHttpUploaderProgressListener fileUploadProgressListener, MediaHttpDownloaderProgressListener fileDownloadProgressListener) {
 
-		this.httpTransport = httpTransport;
-		this.jsonFactory = jsonFactory;
-		this.fileUploadProgressListener = fileUploadProgressListener;
-		this.fileDownloadProgressListener = fileDownloadProgressListener;
-	}
+        this.httpTransport = httpTransport;
+        this.jsonFactory = jsonFactory;
+        this.fileUploadProgressListener = fileUploadProgressListener;
+        this.fileDownloadProgressListener = fileDownloadProgressListener;
+    }
 
-	private Drive getService(@Nonnull TokenBO token) {
+    protected Drive getService(@Nonnull TokenBO token) {
 
-		final GoogleCredential credential = new GoogleCredential.Builder().setClientSecrets(token.getClientId(), token.getClientSecret()).setJsonFactory(jsonFactory).setTransport(httpTransport).build().setRefreshToken(token.getRefreshToken()).setAccessToken(token.getAccessToken());
+        final GoogleCredential credential = new GoogleCredential.Builder().setClientSecrets(token.getClientId(), token.getClientSecret()).setJsonFactory(jsonFactory).setTransport(httpTransport).build().setRefreshToken(token.getRefreshToken()).setAccessToken(token.getAccessToken());
 
-		return new Drive.Builder(httpTransport, jsonFactory, new HttpRequestInitializer() {
+        return new Drive.Builder(httpTransport, jsonFactory, new HttpRequestInitializer() {
 
-			public void initialize(HttpRequest httpRequest) {
+            public void initialize(HttpRequest httpRequest) {
 
-				try {
+                try {
 
-					// initialize credentials
-					credential.initialize(httpRequest);
+                    // initialize credentials
+                    credential.initialize(httpRequest);
 
-					// set connect and read timeouts
-					httpRequest.setConnectTimeout(HTTP_REQUEST_TIMEOUT);
-					httpRequest.setReadTimeout(HTTP_REQUEST_TIMEOUT);
+                    // set connect and read timeouts
+                    httpRequest.setConnectTimeout(HTTP_REQUEST_TIMEOUT);
+                    httpRequest.setReadTimeout(HTTP_REQUEST_TIMEOUT);
 
-				} catch (IOException ex) {
+                } catch (IOException ex) {
 
-					// log exception
-					logger.log(Level.SEVERE, ex.getMessage(), ex);
-				}
-			}
-		}).setApplicationName("DriveCopy").build();
-	}
+                    // log exception
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+            }
+        }).setApplicationName("DriveCopy").build();
+    }
 
-	private <T> T executeWithExponentialBackoff(DriveRequest<T> req) throws IOException, InterruptedException {
+    protected <T> T executeWithExponentialBackoff(DriveRequest<T> req) throws IOException, InterruptedException {
 
-		Random randomGenerator = new Random();
+        Random randomGenerator = new Random();
 
-		for (int n = 0; n < 5; ++n) {
+        for (int n = 0; n < 5; ++n) {
 
-			try {
+            try {
 
-				return req.execute();
+                return req.execute();
 
-			} catch (GoogleJsonResponseException e) {
+            } catch (GoogleJsonResponseException e) {
 
-				if (e.getStatusCode() == 503 || e.getStatusCode() == 500 || (e.getStatusCode() == 403 && (e.getDetails().getErrors().get(0).getReason().equals("rateLimitExceeded") || e.getDetails().getErrors().get(0).getReason().equals("userRateLimitExceeded")))) {
+                if (e.getStatusCode() == 503 || e.getStatusCode() == 500 || (e.getStatusCode() == 403 && (e.getDetails().getErrors().get(0).getReason().equals("rateLimitExceeded") || e.getDetails().getErrors().get(0).getReason().equals("userRateLimitExceeded")))) {
 
-					// apply exponential backoff.
-					Thread.sleep((1 << n) * 1000 + randomGenerator.nextInt(1001));
+                    // apply exponential backoff.
+                    Thread.sleep((1 << n) * 1000 + randomGenerator.nextInt(1001));
 
-				} else {
+                } else {
 
-					// other error, re-throw.
-					throw e;
-				}
-			}
-		}
+                    // other error, re-throw.
+                    throw e;
+                }
+            }
+        }
 
-		throw new IOException("There has been an error, the request never succeeded.");
-	}
+        throw new IOException("There has been an error, the request never succeeded.");
+    }
 
-	public EntryBO downloadEntry(@Nonnull TokenBO token, @Nonnull EntryBO entry) throws SdoException {
+    public EntryBO downloadEntry(@Nonnull TokenBO token, @Nonnull EntryBO entry) throws SdoException {
 
-		try {
+        try {
 
-			// get file
-			Drive service = getService(token);
-			Get get = service.files().get(entry.getId());
-			MediaHttpDownloader downloader = new MediaHttpDownloader(httpTransport, service.getRequestFactory().getInitializer());
-			downloader.setDirectDownloadEnabled(false);
-			downloader.setProgressListener(fileDownloadProgressListener);
-			File file = executeWithExponentialBackoff(get);
+            // get file
+            Drive service = getService(token);
+            Get get = service.files().get(entry.getId());
+            MediaHttpDownloader downloader = new MediaHttpDownloader(httpTransport, service.getRequestFactory().getInitializer());
+            downloader.setDirectDownloadEnabled(false);
+            downloader.setProgressListener(fileDownloadProgressListener);
+            File file = executeWithExponentialBackoff(get);
 
-			// check download URL and size
-			if (file.getDownloadUrl() != null && file.getDownloadUrl().length() > 0) {
+            // check download URL and size
+            if (file.getDownloadUrl() != null && file.getDownloadUrl().length() > 0) {
 
-				// download file
-				FileOutputStream fout = new FileOutputStream(entry.getFile());
-				downloader.download(new GenericUrl(file.getDownloadUrl()), fout);
-				fout.flush();
-				fout.close();
+                // download file
+                FileOutputStream fout = new FileOutputStream(entry.getFile());
+                downloader.download(new GenericUrl(file.getDownloadUrl()), fout);
+                fout.flush();
+                fout.close();
 
-				// return entry
-				entry.setMd5Sum(file.getMd5Checksum());
-				return entry;
+                // return entry
+                entry.setMd5Sum(file.getMd5Checksum());
+                return entry;
 
-			} else {
+            } else {
 
-				// the file doesn't have any content stored on Drive
-				throw new ItemNotFoundException(String.format("Remote file with id '%s' doesn't have any content stored on Drive", entry.getId()));
-			}
+                // the file doesn't have any content stored on Drive
+                throw new ItemNotFoundException(String.format("Remote file with id '%s' doesn't have any content stored on Drive", entry.getId()));
+            }
 
-		} catch (IOException | InterruptedException ex) {
+        } catch (IOException | InterruptedException ex) {
 
-			// re-throw exception
-			throw new SdoException(ex.getMessage(), ex);
-		}
-	}
+            // re-throw exception
+            throw new SdoException(ex.getMessage(), ex);
+        }
+    }
 
-	public EntryBO uploadEntry(@Nonnull TokenBO token, @Nonnull EntryBO entry, @Nonnull String parentId) throws SdoException {
+    public EntryBO uploadEntry(@Nonnull TokenBO token, @Nonnull EntryBO entry, @Nonnull String parentId) throws SdoException {
 
-		try {
+        try {
 
-			// create file item
-			File body = new File();
-			body.setTitle(entry.getName());
-			body.setMimeType(entry.getMimeType());
+            // create file item
+            File body = new File();
+            body.setTitle(entry.getName());
+            body.setMimeType(entry.getMimeType());
 
-			// set parent
+            // set parent
             ParentReference newParent = new ParentReference();
             newParent.setId(parentId);
             body.setParents(new ArrayList<ParentReference>());
             body.getParents().add(newParent);
 
-			// set content
-			FileContent mediaContent = new FileContent(entry.getMimeType(), entry.getFile());
+            // set content
+            FileContent mediaContent = new FileContent(entry.getMimeType(), entry.getFile());
 
-			// upload file
-			Insert insert = getService(token).files().insert(body, mediaContent);
-			MediaHttpUploader uploader = insert.getMediaHttpUploader();
-			uploader.setDirectUploadEnabled(false);
-			uploader.setProgressListener(fileUploadProgressListener);
-			File file = executeWithExponentialBackoff(insert);
+            // upload file
+            Insert insert = getService(token).files().insert(body, mediaContent);
+            MediaHttpUploader uploader = insert.getMediaHttpUploader();
+            uploader.setDirectUploadEnabled(false);
+            uploader.setProgressListener(fileUploadProgressListener);
+            File file = executeWithExponentialBackoff(insert);
 
-			// compose output entry
-			EntryBO entryBO = new EntryBO();
-			entryBO.setId(file.getId());
-			entryBO.setFile(entry.getFile());
-			entryBO.setMd5Sum(file.getMd5Checksum());
-			return entryBO;
+            // compose output entry
+            EntryBO entryBO = new EntryBO();
+            entryBO.setId(file.getId());
+            entryBO.setFile(entry.getFile());
+            entryBO.setMd5Sum(file.getMd5Checksum());
+            return entryBO;
 
-		} catch (IOException | InterruptedException ex) {
+        } catch (IOException | InterruptedException ex) {
 
-			// re-throw exception
-			throw new SdoException(ex.getMessage(), ex);
-		}
-	}
+            // re-throw exception
+            throw new SdoException(ex.getMessage(), ex);
+        }
+    }
 
-	public EntryBO updateEntry(@Nonnull TokenBO token, @Nonnull EntryBO entry) throws SdoException {
+    public EntryBO updateEntry(@Nonnull TokenBO token, @Nonnull EntryBO entry) throws SdoException {
 
-		try {
+        try {
 
-			// get file
-			Drive service = getService(token);
-			File file = executeWithExponentialBackoff(service.files().get(entry.getId()));
+            // get file
+            Drive service = getService(token);
+            File file = executeWithExponentialBackoff(service.files().get(entry.getId()));
 
-			// update file content
-			FileContent mediaContent = new FileContent(entry.getMimeType(), entry.getFile());
-			file.setMimeType(entry.getMimeType());
+            // update file content
+            FileContent mediaContent = new FileContent(entry.getMimeType(), entry.getFile());
+            file.setMimeType(entry.getMimeType());
 
-			// update file
-			Update update = service.files().update(entry.getId(), file, mediaContent);
-			update.setNewRevision(!entry.isSkipRevision());
-			MediaHttpUploader uploader = update.getMediaHttpUploader();
-			uploader.setDirectUploadEnabled(false);
-			uploader.setProgressListener(fileUploadProgressListener);
-			File updatedFile = executeWithExponentialBackoff(update);
+            // update file
+            Update update = service.files().update(entry.getId(), file, mediaContent);
+            update.setNewRevision(!entry.isSkipRevision());
+            MediaHttpUploader uploader = update.getMediaHttpUploader();
+            uploader.setDirectUploadEnabled(false);
+            uploader.setProgressListener(fileUploadProgressListener);
+            File updatedFile = executeWithExponentialBackoff(update);
 
-			// compose output entry
-			EntryBO docBO = new EntryBO();
-			docBO.setId(updatedFile.getId());
-			docBO.setName(updatedFile.getTitle());
-			docBO.setFile(entry.getFile());
-			docBO.setMd5Sum(updatedFile.getMd5Checksum());
-			return docBO;
+            // compose output entry
+            EntryBO docBO = new EntryBO();
+            docBO.setId(updatedFile.getId());
+            docBO.setName(updatedFile.getTitle());
+            docBO.setFile(entry.getFile());
+            docBO.setMd5Sum(updatedFile.getMd5Checksum());
+            return docBO;
 
-		} catch (IOException | InterruptedException ex) {
+        } catch (IOException | InterruptedException ex) {
 
-			// re-throw exception
-			throw new SdoException(ex.getMessage(), ex);
-		}
-	}
+            // re-throw exception
+            throw new SdoException(ex.getMessage(), ex);
+        }
+    }
 
-	public String getLastFolderId(@Nonnull TokenBO token, String[] folders, @Nonnull String rootId, boolean createIfNotFound) throws SdoException {
+    public String getLastFolderId(@Nonnull TokenBO token, String[] folders, @Nonnull String rootId, boolean createIfNotFound) throws SdoException {
 
-		Drive service = getService(token);
+        Drive service = getService(token);
 
-		try {
+        try {
 
-			// check folders
-			String lastParentId = rootId;
-			String lastParentName = null;
-			if (folders != null) {
+            // check folders
+            String lastParentId = rootId;
+            String lastParentName = null;
+            if (folders != null) {
 
-				// check folders existence
-				for (String currentFolder : folders) {
+                // check folders existence
+                for (String currentFolder : folders) {
 
-					try {
+                    try {
 
-						// compose current folder query
-						Files.List request = service.files().list();
-						request.setQ(String.format("title = '%s' and trashed = false and mimeType = 'application/vnd.google-apps.folder' and '%s' in parents", currentFolder, lastParentId));
-						request.setMaxResults(2);
+                        // compose current folder query
+                        Files.List request = service.files().list();
+                        request.setQ(String.format("title = '%s' and trashed = false and mimeType = 'application/vnd.google-apps.folder' and '%s' in parents", currentFolder, lastParentId));
+                        request.setMaxResults(2);
 
-						// execute query
-						logger.fine(String.format("Search remote folder with name '%s'", currentFolder));
-						FileList fs = executeWithExponentialBackoff(request);
+                        // execute query
+                        logger.fine(String.format("Search remote folder with name '%s'", currentFolder));
+                        FileList fs = executeWithExponentialBackoff(request);
 
-						// check no results
-						if (fs.getItems().isEmpty())
-							throw new FolderNotFoundException(String.format("No remote folder found with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
+                        // check no results
+                        if (fs.getItems().isEmpty())
+                            throw new FolderNotFoundException(String.format("No remote folder found with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
 
-						// check multiple results
-						if (fs.getItems().size() > 1)
-							throw new SdoException(String.format("Multiple results for remote folder with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
+                        // check multiple results
+                        if (fs.getItems().size() > 1)
+                            throw new SdoException(String.format("Multiple results for remote folder with name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
 
-						// check exact title
-						File folder = fs.getItems().get(0);
-						if (!folder.getTitle().equals(currentFolder))
-							throw new FolderNotFoundException(String.format("No remote folder found with exact name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
+                        // check exact title
+                        File folder = fs.getItems().get(0);
+                        if (!folder.getTitle().equals(currentFolder))
+                            throw new FolderNotFoundException(String.format("No remote folder found with exact name '%s'%s", currentFolder, lastParentName != null ? String.format(" in remote folder '%s'", lastParentName) : ""));
 
-						// set parent ID for next folder/file
-						lastParentId = folder.getId();
-						lastParentName = folder.getTitle();
+                        // set parent ID for next folder/file
+                        lastParentId = folder.getId();
+                        lastParentName = folder.getTitle();
 
-					} catch (FolderNotFoundException ex) {
+                    } catch (FolderNotFoundException ex) {
 
-						// in case re-throw exception
-						if (!createIfNotFound)
-							throw ex;
+                        // in case re-throw exception
+                        if (!createIfNotFound)
+                            throw ex;
 
-						// create folder
-						logger.fine(String.format("Create remote folder with name '%s'", currentFolder));
-						File folder = new File();
-						folder.setTitle(currentFolder);
-						folder.setMimeType("application/vnd.google-apps.folder");
-						folder.setParents(Collections.singletonList(new ParentReference().setId(lastParentId != null ? lastParentId : "root")));
-						folder = executeWithExponentialBackoff(service.files().insert(folder));
+                        // create folder
+                        logger.fine(String.format("Create remote folder with name '%s'", currentFolder));
+                        File folder = new File();
+                        folder.setTitle(currentFolder);
+                        folder.setMimeType("application/vnd.google-apps.folder");
+                        folder.setParents(Collections.singletonList(new ParentReference().setId(lastParentId != null ? lastParentId : "root")));
+                        folder = executeWithExponentialBackoff(service.files().insert(folder));
 
-						// set parent ID for next folder/file
-						lastParentId = folder.getId();
-						lastParentName = folder.getTitle();
-					}
-				}
-			}
+                        // set parent ID for next folder/file
+                        lastParentId = folder.getId();
+                        lastParentName = folder.getTitle();
+                    }
+                }
+            }
 
-			return lastParentId;
+            return lastParentId;
 
-		} catch (IOException | InterruptedException ex) {
+        } catch (IOException | InterruptedException ex) {
 
-			// re-throw exception
-			throw new SdoException(ex.getMessage(), ex);
-		}
-	}
+            // re-throw exception
+            throw new SdoException(ex.getMessage(), ex);
+        }
+    }
 
-	public EntryBO searchEntry(@Nonnull TokenBO token, @Nonnull String name, @Nonnull String parentId) throws SdoException {
+    public EntryBO searchEntry(@Nonnull TokenBO token, @Nonnull String name, @Nonnull String parentId) throws SdoException {
 
-		try {
+        try {
 
-			// compose list query
-			Files.List request = getService(token).files().list();
-			request.setQ(String.format("title = '%s' and trashed = false and mimeType != 'application/vnd.google-apps.folder' and '%s' in parents", name, parentId));
-			request.setMaxResults(2);
+            // compose list query
+            Files.List request = getService(token).files().list();
+            request.setQ(String.format("title = '%s' and trashed = false and mimeType != 'application/vnd.google-apps.folder' and '%s' in parents", name, parentId));
+            request.setMaxResults(2);
 
-			// execute query
-			logger.fine(String.format("Search entry with name '%s'", name));
-			FileList files = executeWithExponentialBackoff(request);
+            // execute query
+            logger.fine(String.format("Search entry with name '%s'", name));
+            FileList files = executeWithExponentialBackoff(request);
 
-			// check no results
-			if (files.getItems().isEmpty())
-				throw new ItemNotFoundException(String.format("No remote file found with name '%s'", name));
+            // check no results
+            if (files.getItems().isEmpty())
+                throw new ItemNotFoundException(String.format("No remote file found with name '%s'", name));
 
-			// check multiple results
-			if (files.getItems().size() > 1)
-				throw new SdoException(String.format("Multiple results for entry with name '%s'", name));
+            // check multiple results
+            if (files.getItems().size() > 1)
+                throw new SdoException(String.format("Multiple results for entry with name '%s'", name));
 
-			// check exact title
-			File file = files.getItems().get(0);
-			if (!file.getTitle().equals(name))
-				throw new ItemNotFoundException(String.format("No remote file found with exact name '%s'", name));
+            // check exact title
+            File file = files.getItems().get(0);
+            if (!file.getTitle().equals(name))
+                throw new ItemNotFoundException(String.format("No remote file found with exact name '%s'", name));
 
-			// return entry
-			EntryBO entry = new EntryBO();
-			entry.setId(file.getId());
-			entry.setName(file.getTitle());
-			return entry;
+            // return entry
+            EntryBO entry = new EntryBO();
+            entry.setId(file.getId());
+            entry.setName(file.getTitle());
+            return entry;
 
-		} catch (IOException | InterruptedException ex) {
+        } catch (IOException | InterruptedException ex) {
 
-			// re-throw exception
-			throw new SdoException(ex.getMessage(), ex);
-		}
-	}
+            // re-throw exception
+            throw new SdoException(ex.getMessage(), ex);
+        }
+    }
 }

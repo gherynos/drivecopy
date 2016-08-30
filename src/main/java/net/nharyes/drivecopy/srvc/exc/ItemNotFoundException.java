@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,16 +17,16 @@
 package net.nharyes.drivecopy.srvc.exc;
 
 public class ItemNotFoundException extends SdoException {
-	
-	private static final long serialVersionUID = 1L;
 
-	public ItemNotFoundException(String message) {
+    private static final long serialVersionUID = 1L;
 
-		super(message);
-	}
+    public ItemNotFoundException(String message) {
 
-	public ItemNotFoundException(String message, Throwable ex) {
+        super(message);
+    }
 
-		super(message, ex);
-	}
+    public ItemNotFoundException(String message, Throwable ex) {
+
+        super(message, ex);
+    }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012-2015 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,8 +20,8 @@ import net.nharyes.drivecopy.biz.bo.TokenBO;
 
 public interface TokenWorkflowManager extends WorkflowManager<TokenBO> {
 
-	/*
-	 * Workflow actions
-	 */
-	int ACTION_GET = 0;
+    /*
+     * Workflow actions
+     */
+    int ACTION_GET = 0;
 }

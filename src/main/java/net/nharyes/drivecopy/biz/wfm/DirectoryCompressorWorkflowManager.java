@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012-2015 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,9 +20,9 @@ import net.nharyes.drivecopy.biz.bo.DirectoryBO;
 
 public interface DirectoryCompressorWorkflowManager extends WorkflowManager<DirectoryBO> {
 
-	/*
-	 * Workflow actions
-	 */
-	int ACTION_COMPRESS = 0;
-	int ACTION_DECOMPRESS = 1;
+    /*
+     * Workflow actions
+     */
+    int ACTION_COMPRESS = 0;
+    int ACTION_DECOMPRESS = 1;
 }

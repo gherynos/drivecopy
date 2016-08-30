@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,43 +18,43 @@ package net.nharyes.drivecopy.biz.bo;
 
 public class TokenBO implements BusinessObject {
 
-	private String clientId;
+    private String clientId;
 
-	private String clientSecret;
+    private String clientSecret;
 
-	private String accessToken;
+    private String accessToken;
 
-	private String refreshToken;
+    private String refreshToken;
 
-	public TokenBO() {
+    public TokenBO() {
 
-	}
+    }
 
-	public TokenBO(String clientId, String clientSecret, String accessToken, String refreshToken) {
+    public TokenBO(String clientId, String clientSecret, String accessToken, String refreshToken) {
 
-		this.clientId = clientId;
-		this.clientSecret = clientSecret;
-		this.accessToken = accessToken;
-		this.refreshToken = refreshToken;
-	}
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+    }
 
-	public String getClientId() {
+    public String getClientId() {
 
-		return clientId;
-	}
+        return clientId;
+    }
 
-	public String getClientSecret() {
+    public String getClientSecret() {
 
-		return clientSecret;
-	}
+        return clientSecret;
+    }
 
-	public String getAccessToken() {
+    public String getAccessToken() {
 
-		return accessToken;
-	}
+        return accessToken;
+    }
 
-	public String getRefreshToken() {
+    public String getRefreshToken() {
 
-		return refreshToken;
-	}
+        return refreshToken;
+    }
 }

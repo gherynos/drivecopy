@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,21 +22,21 @@ import java.util.logging.LogRecord;
 
 public class TinyFormatter extends Formatter {
 
-	@Override
-	public String format(LogRecord record) {
-		
-		// set level char
-		char c = '?';
-		if (record.getLevel().equals(Level.INFO))
-			c = '-';
-		else if (record.getLevel().equals(Level.FINE))
-			c = '#';
-		else if (record.getLevel().equals(Level.WARNING))
-			c = '*';
-		else if (record.getLevel().equals(Level.SEVERE))
-			c = '!';
-		
-		// return message
-		return String.format("%1$s%1$s %2$s\n", c, record.getMessage());
-	}
+    @Override
+    public String format(LogRecord record) {
+
+        // set level char
+        char c = '?';
+        if (record.getLevel().equals(Level.INFO))
+            c = '-';
+        else if (record.getLevel().equals(Level.FINE))
+            c = '#';
+        else if (record.getLevel().equals(Level.WARNING))
+            c = '*';
+        else if (record.getLevel().equals(Level.SEVERE))
+            c = '!';
+
+        // return message
+        return String.format("%1$s%1$s %2$s\n", c, record.getMessage());
+    }
 }

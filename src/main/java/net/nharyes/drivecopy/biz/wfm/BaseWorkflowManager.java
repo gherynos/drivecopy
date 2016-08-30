@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +16,14 @@
 
 package net.nharyes.drivecopy.biz.wfm;
 
-import java.util.logging.Logger;
-
 import net.nharyes.drivecopy.biz.bo.BusinessObject;
+
+import java.util.logging.Logger;
 
 public abstract class BaseWorkflowManager<B extends BusinessObject> implements WorkflowManager<B> {
 
-	/*
-	 * Logger
-	 */
-	protected final Logger logger = Logger.getLogger(getClass().getName());
+    /*
+     * Logger
+     */
+    protected final Logger logger = Logger.getLogger(getClass().getName());
 }

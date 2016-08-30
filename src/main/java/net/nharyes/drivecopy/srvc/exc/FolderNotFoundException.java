@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012-2013 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,16 +17,16 @@
 package net.nharyes.drivecopy.srvc.exc;
 
 public class FolderNotFoundException extends SdoException {
-	
-	private static final long serialVersionUID = 1L;
 
-	public FolderNotFoundException(String message) {
+    private static final long serialVersionUID = 1L;
 
-		super(message);
-	}
+    public FolderNotFoundException(String message) {
 
-	public FolderNotFoundException(String message, Throwable ex) {
+        super(message);
+    }
 
-		super(message, ex);
-	}
+    public FolderNotFoundException(String message, Throwable ex) {
+
+        super(message, ex);
+    }
 }

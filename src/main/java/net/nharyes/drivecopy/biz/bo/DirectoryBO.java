@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,51 +22,51 @@ import java.util.List;
 
 public class DirectoryBO implements BusinessObject {
 
-	private File file;
-	
-	private File destinationDirectory;
-	
-	private int level;
-	
-	private List<File> notCompressed = new ArrayList<>();
+    private File file;
 
-	public File getFile() {
-		
-		return file;
-	}
+    private File destinationDirectory;
 
-	public void setFile(File file) {
-		
-		this.file = file;
-	}
+    private int level;
 
-	public int getLevel() {
-		
-		return level;
-	}
+    private List<File> notCompressed = new ArrayList<>();
 
-	public void setLevel(int level) {
-		
-		this.level = level;
-	}
+    public File getFile() {
 
-	public File getDestinationDirectory() {
-		
-		return destinationDirectory;
-	}
+        return file;
+    }
 
-	public void setDestinationDirectory(File destinationDirectory) {
-		
-		this.destinationDirectory = destinationDirectory;
-	}
+    public void setFile(File file) {
 
-	public List<File> getNotCompressed() {
-		
-		return notCompressed;
-	}
+        this.file = file;
+    }
 
-	public void setNotCompressed(List<File> notCompressed) {
-		
-		this.notCompressed = notCompressed;
-	}
+    public int getLevel() {
+
+        return level;
+    }
+
+    public void setLevel(int level) {
+
+        this.level = level;
+    }
+
+    public File getDestinationDirectory() {
+
+        return destinationDirectory;
+    }
+
+    public void setDestinationDirectory(File destinationDirectory) {
+
+        this.destinationDirectory = destinationDirectory;
+    }
+
+    public List<File> getNotCompressed() {
+
+        return notCompressed;
+    }
+
+    public void setNotCompressed(List<File> notCompressed) {
+
+        this.notCompressed = notCompressed;
+    }
 }

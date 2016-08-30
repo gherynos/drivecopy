@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,17 +21,17 @@ import java.util.logging.Level;
 
 public class SystemOutHandler extends ConsoleHandler {
 
-	public SystemOutHandler() {
+    public SystemOutHandler() {
 
-		super();
+        super();
 
-		// output to System.out
-		setOutputStream(System.out);
+        // output to System.out
+        setOutputStream(System.out);
 
-		// INFO level
-		setLevel(Level.INFO);
+        // INFO level
+        setLevel(Level.INFO);
 
-		// tiny formatter
-		setFormatter(new TinyFormatter());
-	}
+        // tiny formatter
+        setFormatter(new TinyFormatter());
+    }
 }

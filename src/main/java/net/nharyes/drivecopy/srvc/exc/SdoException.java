@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,15 +18,15 @@ package net.nharyes.drivecopy.srvc.exc;
 
 public class SdoException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public SdoException(String message) {
+    public SdoException(String message) {
 
-		super(message);
-	}
+        super(message);
+    }
 
-	public SdoException(String message, Throwable ex) {
+    public SdoException(String message, Throwable ex) {
 
-		super(message, ex);
-	}
+        super(message, ex);
+    }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012-2015 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,32 +16,32 @@
 
 package net.nharyes.drivecopy;
 
-import java.text.MessageFormat;
-import java.util.logging.Logger;
-
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.googleapis.media.MediaHttpDownloaderProgressListener;
 import com.google.inject.Singleton;
 
+import java.text.MessageFormat;
+import java.util.logging.Logger;
+
 @Singleton
 public class FileDownloadProgressListener implements MediaHttpDownloaderProgressListener {
 
-	/*
-	 * Logger
-	 */
-	protected final Logger logger = Logger.getLogger(getClass().getName());
+    /*
+     * Logger
+     */
+    protected final Logger logger = Logger.getLogger(getClass().getName());
 
-	public void progressChanged(MediaHttpDownloader downloader) {
+    public void progressChanged(MediaHttpDownloader downloader) {
 
-		switch (downloader.getDownloadState()) {
-		case MEDIA_IN_PROGRESS:
-			logger.info(String.format("Progress: %s", MessageFormat.format("{0,number,#%}", downloader.getProgress())));
-			break;
-		case MEDIA_COMPLETE:
-			logger.info("Download complete");
-			break;
-		case NOT_STARTED:
-			break;
-		}
-	}
+        switch (downloader.getDownloadState()) {
+            case MEDIA_IN_PROGRESS:
+                logger.info(String.format("Progress: %s", MessageFormat.format("{0,number,#%}", downloader.getProgress())));
+                break;
+            case MEDIA_COMPLETE:
+                logger.info("Download complete");
+                break;
+            case NOT_STARTED:
+                break;
+        }
+    }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,15 +18,15 @@ package net.nharyes.drivecopy.biz.exc;
 
 public class WorkflowManagerException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public WorkflowManagerException(String message) {
+    public WorkflowManagerException(String message) {
 
-		super(message);
-	}
+        super(message);
+    }
 
-	public WorkflowManagerException(String message, Throwable ex) {
+    public WorkflowManagerException(String message, Throwable ex) {
 
-		super(message, ex);
-	}
+        super(message, ex);
+    }
 }

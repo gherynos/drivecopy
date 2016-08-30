@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,5 +21,5 @@ import net.nharyes.drivecopy.biz.exc.WorkflowManagerException;
 
 public interface WorkflowManager<B extends BusinessObject> {
 
-	B handleWorkflow(B businessObject, int action) throws WorkflowManagerException;
+    B handleWorkflow(B businessObject, int action) throws WorkflowManagerException;
 }
