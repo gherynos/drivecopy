@@ -352,6 +352,7 @@ public class DriveSdoImpl implements DriveSdo {
             EntryBO entry = new EntryBO();
             entry.setId(file.getId());
             entry.setName(file.getTitle());
+            entry.setMd5Sum(file.getMd5Checksum());
             return entry;
 
         } catch (IOException | InterruptedException ex) {

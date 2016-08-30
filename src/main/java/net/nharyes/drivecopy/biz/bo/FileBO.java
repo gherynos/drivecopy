@@ -34,7 +34,7 @@ public class FileBO implements BusinessObject {
 
     private boolean skipRevision;
 
-    private boolean checkMd5;
+    private boolean archive;
 
     private boolean force;
 
@@ -110,14 +110,14 @@ public class FileBO implements BusinessObject {
         this.skipRevision = skipRevision;
     }
 
-    public boolean isCheckMd5() {
+    public boolean isArchive() {
 
-        return checkMd5;
+        return archive;
     }
 
-    public void setCheckMd5(boolean checkMd5) {
+    public void setArchive(boolean archive) {
 
-        this.checkMd5 = checkMd5;
+        this.archive = archive;
     }
 
     public boolean isForce() {

@@ -34,7 +34,7 @@ public class Main {
     /*
      * Version
      */
-    public static final String VERSION = "1.2.2";
+    public static final String VERSION = "1.3.0";
 
     /*
      * Logger
@@ -133,10 +133,10 @@ public class Main {
             if (line.hasOption('m'))
                 fileBO.setMimeType(line.getOptionValue('m'));
 
-            // check MD5 comparison
-            fileBO.setCheckMd5(false);
-            if (line.hasOption('c'))
-                fileBO.setCheckMd5(true);
+            // archive
+            fileBO.setArchive(false);
+            if (line.hasOption('a'))
+                fileBO.setArchive(true);
 
             // check force
             fileBO.setForce(false);
@@ -164,7 +164,7 @@ public class Main {
             // print help
             HelpFormatter formatter = new HelpFormatter();
             System.out.println("Drive Copy version " + VERSION);
-            System.out.println("Copyright 2012-2015 Luca Zanconato (luca.zanconato@nharyes.net)");
+            System.out.println("Copyright 2012-2016 Luca Zanconato (luca.zanconato@nharyes.net)");
             System.out.println();
             formatter.printHelp("java -jar " + JAR_FILE + " [OPTIONS] <MODE> [ENTRY]", DESCRIPTION + "\n", options, "\nMODE can be download/replace/upload.\nENTRY is the path of the entry in Google Drive (i.e. \"Test Folder/Another Folder/file.txt\"); if not set, the name of the local file/directory will be used.");
             System.out.println();
@@ -252,13 +252,13 @@ public class Main {
         skipRevision.setDescription("do not create a new revision when replacing remote entry.");
         options.addOption(skipRevision);
 
-        // check MD5 option
-        Option checkMd5 = OptionBuilder.create('c');
-        checkMd5.setLongOpt("checkmd5");
-        checkMd5.setOptionalArg(true);
-        checkMd5.setType(Boolean.class);
-        checkMd5.setDescription("compare uploaded/downloaded local file MD5 summary with the one of the remote entry.");
-        options.addOption(checkMd5);
+        // archive option
+        Option archive = OptionBuilder.create('a');
+        archive.setLongOpt("archive");
+        archive.setOptionalArg(true);
+        archive.setType(Boolean.class);
+        archive.setDescription("skip replace/download if local file and remote entry MD5 summaries are the same.");
+        options.addOption(archive);
 
         // check force creation option
         Option forceCreation = OptionBuilder.create('F');

@@ -208,16 +208,34 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
                     entry.setMimeType("application/octet-stream");
             }
 
-            // upload/replace entry
-            logger.info(String.format("MIME type of the entry: %s", entry.getMimeType()));
-            if (upload)
-                entry = driveSdo.uploadEntry(token, entry, parentId);
-            else
-                entry = driveSdo.updateEntry(token, entry);
+            // in case check existing file MD5 summary
+            boolean proceedWithReplacement = true;
+            if (!upload && file.isArchive()) {
 
-            // in case check MD5 of the replaced entry
-            if (file.isCheckMd5())
+                try {
+
+                    checkMD5(entry);
+                    proceedWithReplacement = false;
+                    logger.info("The remote entry already has the same content of the local file.");
+
+                } catch (WorkflowManagerException | IOException ex) {
+
+                    /* wrong digest ignored: the file will be downloaded */
+                }
+            }
+
+            // upload/replace entry
+            if (upload || proceedWithReplacement) {
+
+                logger.info(String.format("MIME type of the entry: %s", entry.getMimeType()));
+                if (upload)
+                    entry = driveSdo.uploadEntry(token, entry, parentId);
+                else
+                    entry = driveSdo.updateEntry(token, entry);
+
+                // check MD5 of the replaced entry
                 checkMD5(entry);
+            }
 
             // in case delete temporary file
             if (file.isDirectory()) {
@@ -285,6 +303,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
             EntryBO entry = driveSdo.searchEntry(token, extractFileName(file.getName()), parentId);
 
             // check directory
+            boolean downloadFile = true;
             if (file.isDirectory()) {
 
                 // create temporary file
@@ -298,14 +317,31 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
                 // set file property
                 entry.setFile(file.getFile());
+
+                // in case check existing file MD5 summary
+                if (file.isArchive() && entry.getFile().exists()) {
+
+                    try {
+
+                        checkMD5(entry);
+                        downloadFile = false;
+                        logger.info("The local file already has the same content of the remote entry.");
+
+                    } catch (WorkflowManagerException | IOException ex) {
+
+                        /* wrong digest ignored: the file will be downloaded */
+                    }
+                }
             }
 
-            // download entry
-            entry = driveSdo.downloadEntry(token, entry);
+            if (downloadFile) {
 
-            // in case check MD5 of the downloaded entry
-            if (file.isCheckMd5())
+                // download entry
+                entry = driveSdo.downloadEntry(token, entry);
+
+                // check MD5 of the downloaded entry
                 checkMD5(entry);
+            }
 
             // check directory
             if (file.isDirectory()) {
