@@ -176,7 +176,8 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
             entry.setFile(file.getFile());
 
             // set MIME type property
-            entry.setMimeType(file.getMimeType());
+            if (file.getMimeType() != null)
+                entry.setMimeType(file.getMimeType());
 
             // check skip revision option
             if (file.isSkipRevision() && upload)

@@ -353,6 +353,7 @@ public class DriveSdoImpl implements DriveSdo {
             entry.setId(file.getId());
             entry.setName(file.getTitle());
             entry.setMd5Sum(file.getMd5Checksum());
+            entry.setMimeType(file.getMimeType());
             return entry;
 
         } catch (IOException | InterruptedException ex) {
