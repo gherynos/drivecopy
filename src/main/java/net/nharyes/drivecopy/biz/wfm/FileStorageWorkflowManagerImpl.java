@@ -103,16 +103,16 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
     private void checkMD5(EntryBO entry) throws IOException, WorkflowManagerException {
 
         // calculate MD5 of the local file/directory
-        logger.info("calculate the MD5 summary of the file...");
+        logger.finer("calculate the MD5 summary of the file...");
         byte[] digest = Files.hash(entry.getFile(), Hashing.md5()).asBytes();
         String sDigest = new BigInteger(1, digest).toString(16);
-        logger.fine(String.format("digest of the file: %s", sDigest));
-        logger.fine(String.format("digest of the entry: %s", entry.getMd5Sum()));
+        logger.finer(String.format("digest of the file: %s", sDigest));
+        logger.finer(String.format("digest of the entry: %s", entry.getMd5Sum()));
 
         // compare digests
         if (!sDigest.equalsIgnoreCase(entry.getMd5Sum()))
             throw new WorkflowManagerException("wrong digest!");
-        logger.info("digests comparison OK");
+        logger.fine("Digests comparison OK");
     }
 
     private FileBO upsert(FileBO file, boolean upload) throws WorkflowManagerException {
@@ -160,7 +160,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
                     // switch to upload mode
                     upload = true;
-                    logger.info("Switched to upload mode");
+                    logger.fine("Switched to upload mode");
                 }
 
                 if (upload) {
@@ -189,7 +189,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
             if (file.isDirectory()) {
 
                 // compress directory
-                logger.info(String.format("Compress directory with level '%d'", file.getCompressionLevel()));
+                logger.fine(String.format("Compress directory with level '%d'", file.getCompressionLevel()));
                 dirBO.setFile(file.getFile());
                 dirBO.setLevel(file.getCompressionLevel());
                 dirBO = directoryCompressorWorkflowManager.handleWorkflow(dirBO, DirectoryCompressorWorkflowManager.ACTION_COMPRESS);
@@ -216,7 +216,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
                     checkMD5(entry);
                     proceedWithReplacement = false;
-                    logger.info("The remote entry already has the same content of the local file.");
+                    logger.fine("The remote entry already has the same content of the local file.");
 
                 } catch (WorkflowManagerException | IOException ex) {
 
@@ -227,7 +227,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
             // upload/replace entry
             if (upload || proceedWithReplacement) {
 
-                logger.info(String.format("MIME type of the entry: %s", entry.getMimeType()));
+                logger.finer(String.format("MIME type of the entry: %s", entry.getMimeType()));
                 if (upload)
                     entry = driveSdo.uploadEntry(token, entry, parentId);
                 else
@@ -240,15 +240,15 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
             // in case delete temporary file
             if (file.isDirectory()) {
 
-                logger.fine("Delete temporary file");
+                logger.finer("Delete temporary file");
                 if (!entry.getFile().delete())
-                    logger.fine("Unable to delete temporary file...");
+                    logger.finer("Unable to delete temporary file...");
             }
 
             // in case delete file or directory
             if (file.isDeleteAfter()) {
 
-                logger.info("Process file(s) for deletion...");
+                logger.fine("Process file(s) for deletion...");
                 processFileForDeletion(file.getFile(), dirBO.getNotCompressed());
             }
 
@@ -308,7 +308,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
                 // create temporary file
                 File tempFile = File.createTempFile("drivecopy" + System.currentTimeMillis(), "temp");
-                logger.fine(String.format("Created temporary file '%s'", tempFile.getAbsolutePath()));
+                logger.finer(String.format("Created temporary file '%s'", tempFile.getAbsolutePath()));
 
                 // set file property
                 entry.setFile(tempFile);
@@ -325,7 +325,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
 
                         checkMD5(entry);
                         downloadFile = false;
-                        logger.info("The local file already has the same content of the remote entry.");
+                        logger.fine("The local file already has the same content of the remote entry.");
 
                     } catch (WorkflowManagerException | IOException ex) {
 
@@ -346,7 +346,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
             // check directory
             if (file.isDirectory()) {
 
-                logger.info("Decompress file");
+                logger.fine("Decompress file");
 
                 // decompress file
                 DirectoryBO dirBO = new DirectoryBO();
@@ -355,9 +355,9 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
                 dirBO = directoryCompressorWorkflowManager.handleWorkflow(dirBO, DirectoryCompressorWorkflowManager.ACTION_DECOMPRESS);
 
                 // delete downloaded file
-                logger.fine("Delete downloaded file");
+                logger.finer("Delete downloaded file");
                 if (!entry.getFile().delete())
-                    logger.fine("Unable to delete downloaded file...");
+                    logger.finer("Unable to delete downloaded file...");
 
                 // return decompressed directory
                 FileBO fBO = new FileBO();
@@ -399,7 +399,7 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
         if (f.isDirectory()) {
 
             // process all files contained
-            logger.fine(String.format("Process directory '%s' for deletion", f.getAbsolutePath()));
+            logger.finer(String.format("Process directory '%s' for deletion", f.getAbsolutePath()));
             File[] files = f.listFiles();
             assert files != null;
             for (File fl : files)
@@ -407,8 +407,8 @@ public class FileStorageWorkflowManagerImpl extends BaseWorkflowManager<FileBO> 
         }
 
         // delete file/directory
-        logger.fine(String.format("Delete file/directory '%s'", f.getAbsolutePath()));
+        logger.finer(String.format("Delete file/directory '%s'", f.getAbsolutePath()));
         if (!f.delete())
-            logger.fine("Unable to delete file/directory...");
+            logger.finer("Unable to delete file/directory...");
     }
 }

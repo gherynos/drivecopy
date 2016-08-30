@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Luca Zanconato
+ * Copyright 2012-2016 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ public class TinyFormatter extends Formatter {
             c = '-';
         else if (record.getLevel().equals(Level.FINE))
             c = '#';
+        else if (record.getLevel().equals(Level.FINER))
+            c = '>';
         else if (record.getLevel().equals(Level.WARNING))
             c = '*';
         else if (record.getLevel().equals(Level.SEVERE))

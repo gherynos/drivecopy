@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2015 Luca Zanconato
+ * Copyright 2012-2016 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,11 +52,11 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
         try {
 
             // log action
-            logger.fine("Compress directory");
+            logger.finer("Compress directory");
 
             // create temporary file
             File tempFile = File.createTempFile("drivecopy" + System.currentTimeMillis(), "temp");
-            logger.fine(String.format("Created temporary file '%s'", tempFile.getAbsolutePath()));
+            logger.finer(String.format("Created temporary file '%s'", tempFile.getAbsolutePath()));
 
             // create output stream
             BufferedOutputStream bout = new BufferedOutputStream(new FileOutputStream(tempFile));
@@ -88,7 +88,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
         try {
 
             // log action
-            logger.fine("Decompress directory");
+            logger.finer("Decompress directory");
 
             // output stream
             FileInputStream fin = new FileInputStream(directory.getFile());
@@ -106,7 +106,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
             while ((entry = zis.getNextEntry()) != null) {
 
                 // status
-                logger.info(String.format("Decompressing '%s'", entry.getName().substring(entry.getName().lastIndexOf(File.separator) + 1)));
+                logger.fine(String.format("Decompressing '%s'", entry.getName().substring(entry.getName().lastIndexOf(File.separator) + 1)));
 
                 // in case create subdirectories for file
                 String f = directory.getDestinationDirectory().getAbsolutePath() + File.separator + entry.getName();
@@ -141,7 +141,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
                     }
                     dest.flush();
                     dest.close();
-                    logger.fine("file data written");
+                    logger.finer("file data written");
                 }
             }
             zis.close();
@@ -187,7 +187,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
             String entryName = f.getAbsolutePath().substring(f.getAbsolutePath().indexOf(path) + path.length() + 1);
 
             // status
-            logger.info(String.format("Compressing '%s'", f.getName()));
+            logger.fine(String.format("Compressing '%s'", f.getName()));
 
             // create input stream
             BufferedInputStream bin = new BufferedInputStream(new FileInputStream(f), BUFFER);
@@ -201,7 +201,7 @@ public class DirectoryCompressorWorkflowManagerImpl extends BaseWorkflowManager<
                 zout.write(data, 0, count);
             }
             bin.close();
-            logger.fine("ZIP entry created");
+            logger.finer("ZIP entry created");
         }
     }
 }

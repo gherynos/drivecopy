@@ -53,6 +53,12 @@ public class Main {
 
     public Main(String[] args) {
 
+        // set logger handler
+        Logger logger = Logger.getLogger(Main.class.getPackage().getName());
+        logger.setUseParentHandlers(false);
+        logger.addHandler(new SystemOutHandler());
+        logger.setLevel(Level.FINE);
+
         // compose options
         composeOptions();
 
@@ -64,13 +70,20 @@ public class Main {
             // parse the command line arguments
             CommandLine line = parser.parse(options, args);
 
+            // check verbosity options
+            if (line.hasOption('T'))
+                logger.setLevel(Level.INFO);
+
+            else if (line.hasOption('v'))
+                logger.setLevel(Level.FINER);
+
             // check log option
             if (line.hasOption('L')) {
 
                 // add file handler
                 FileHandler handler = new FileHandler(line.getOptionValue('L'));
-                handler.setLevel(Level.FINE);
-                Logger.getLogger(getClass().getPackage().getName()).addHandler(handler);
+                handler.setLevel(Level.FINER);
+                logger.addHandler(handler);
                 logger.info(String.format("Added log output file '%s'", line.getOptionValue('L')));
             }
 
@@ -284,15 +297,25 @@ public class Main {
         tree.setType(Boolean.class);
         tree.setDescription("create remote folders tree if one or more remote folders are not found.");
         options.addOption(tree);
+
+        // terse logging option
+        Option terse = OptionBuilder.create('T');
+        terse.setLongOpt("terse");
+        terse.setOptionalArg(true);
+        terse.setType(Boolean.class);
+        terse.setDescription("set terse output.");
+        options.addOption(terse);
+
+        // verbose logging option
+        Option verbose = OptionBuilder.create('v');
+        verbose.setLongOpt("verbose");
+        verbose.setOptionalArg(true);
+        verbose.setType(Boolean.class);
+        verbose.setDescription("set verbose output.");
+        options.addOption(verbose);
     }
 
     public static void main(String[] args) {
-
-        // set logger handler
-        Logger logger = Logger.getLogger(Main.class.getPackage().getName());
-        logger.setUseParentHandlers(false);
-        logger.addHandler(new SystemOutHandler());
-        logger.setLevel(Level.FINE);
 
         new Main(args);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Luca Zanconato
+ * Copyright 2012-2016 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ public class SystemOutHandler extends ConsoleHandler {
         // output to System.out
         setOutputStream(System.out);
 
-        // INFO level
-        setLevel(Level.INFO);
+        // level
+        setLevel(Level.FINER);
 
         // tiny formatter
         setFormatter(new TinyFormatter());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2015 Luca Zanconato
+ * Copyright 2012-2016 Luca Zanconato
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,16 +36,16 @@ public class FileUploadProgressListener implements MediaHttpUploaderProgressList
 
         switch (uploader.getUploadState()) {
             case INITIATION_STARTED:
-                logger.info("Starting upload...");
+                logger.fine("Starting upload...");
                 break;
             case INITIATION_COMPLETE:
-                logger.info("Upload started");
+                logger.fine("Upload started");
                 break;
             case MEDIA_IN_PROGRESS:
-                logger.info(String.format("Progress: %s", MessageFormat.format("{0,number,#%}", uploader.getProgress())));
+                logger.fine(String.format("Progress: %s", MessageFormat.format("{0,number,#%}", uploader.getProgress())));
                 break;
             case MEDIA_COMPLETE:
-                logger.info("Upload complete");
+                logger.fine("Upload complete");
                 break;
             case NOT_STARTED:
                 break;

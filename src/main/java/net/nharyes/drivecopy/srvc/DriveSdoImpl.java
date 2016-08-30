@@ -272,7 +272,7 @@ public class DriveSdoImpl implements DriveSdo {
                         request.setMaxResults(2);
 
                         // execute query
-                        logger.fine(String.format("Search remote folder with name '%s'", currentFolder));
+                        logger.finer(String.format("Search remote folder with name '%s'", currentFolder));
                         FileList fs = executeWithExponentialBackoff(request);
 
                         // check no results
@@ -299,7 +299,7 @@ public class DriveSdoImpl implements DriveSdo {
                             throw ex;
 
                         // create folder
-                        logger.fine(String.format("Create remote folder with name '%s'", currentFolder));
+                        logger.finer(String.format("Create remote folder with name '%s'", currentFolder));
                         File folder = new File();
                         folder.setTitle(currentFolder);
                         folder.setMimeType("application/vnd.google-apps.folder");
@@ -332,7 +332,7 @@ public class DriveSdoImpl implements DriveSdo {
             request.setMaxResults(2);
 
             // execute query
-            logger.fine(String.format("Search entry with name '%s'", name));
+            logger.finer(String.format("Search entry with name '%s'", name));
             FileList files = executeWithExponentialBackoff(request);
 
             // check no results
