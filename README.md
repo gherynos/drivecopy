@@ -8,7 +8,7 @@ Drive Copy is a simple command line utility to download, replace and upload Goog
 Getting started
 ---------------
 
-Download the [latest release](https://pkg.nharyes.net/drivecopy/drivecopy.jar) and see the examples below.  
+Download the [latest release](https://pkg.naes.co/drivecopy/drivecopy.jar) and see the examples below.  
 The first time Drive Copy tries to reach Google it will ask authorization codes: see [Setup](https://github.com/Gherynos/DriveCopy/wiki/Setup) steps.  
 For the complete list of options see the [How To](https://github.com/Gherynos/DriveCopy/wiki/How-To).
 
