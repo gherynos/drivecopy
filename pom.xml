@@ -8,7 +8,7 @@
     <packaging>jar</packaging>
 
     <name>DriveCopy</name>
-    <url>https://github.com/Gherynos/DriveCopy</url>
+    <url>https://github.com/gherynos/driveCopy</url>
 
     <developers>
         <developer>
@@ -25,14 +25,6 @@
         </license>
     </licenses>
 
-    <properties>
-        <github.user>Gherynos</github.user>
-        <github.repository>DriveCopy</github.repository>
-        <github.repository.url>http://github.com/${github.user}/${github.repository}</github.repository.url>
-        <github.connection>scm:git:ssh://git@github.com/${github.user}/${github.repository}</github.connection>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <scm>
         <url>${github.repository.url}</url>
         <connection>${github.connection}</connection>
@@ -41,15 +33,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <version>3.0</version>
+            <version>4.2.3</version>
             <classifier>no_aop</classifier>
         </dependency>
         <dependency>
@@ -65,17 +51,17 @@
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-drive</artifactId>
-            <version>v2-rev231-1.22.0</version>
+            <version>v2-rev20200413-1.30.9</version>
         </dependency>
         <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client</artifactId>
-            <version>1.22.0</version>
+            <version>1.35.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client-jackson2</artifactId>
-            <version>1.22.0</version>
+            <version>1.35.0</version>
         </dependency>
         <dependency>
             <groupId>commons-configuration</groupId>
@@ -85,7 +71,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>14.0.1</version>
+            <version>29.0-jre</version>
         </dependency>
     </dependencies>
 
