@@ -3,14 +3,14 @@ Drive Copy
 
 Drive Copy is a simple command line utility to download, replace and upload Google Drive binary files.
 
-[![Build Status](https://travis-ci.org/Gherynos/drivecopy.svg?branch=master)](https://travis-ci.org/Gherynos/drivecopy)
+[![Build Status](https://travis-ci.org/gherynos/drivecopy.svg?branch=master)](https://travis-ci.org/gherynos/drivecopy)
 
 Getting started
 ---------------
 
-Download the [latest release](https://pkg.naes.co/drivecopy/drivecopy.jar) and see the examples below.  
-The first time Drive Copy tries to reach Google it will ask authorization codes: see [Setup](https://github.com/Gherynos/DriveCopy/wiki/Setup) steps.  
-For the complete list of options see the [How To](https://github.com/Gherynos/DriveCopy/wiki/How-To).
+Download the [latest release](https://github.com/gherynos/drivecopy/releases) and see the examples below.  
+The first time Drive Copy tries to reach Google it will ask authorization codes: see [Setup](https://github.com/gherynos/drivecopy/wiki/Setup) steps.  
+For the complete list of options see the [How To](https://github.com/gherynos/drivecopy/wiki/How-To).
 
 Features
 --------
@@ -41,19 +41,12 @@ Replace a file:
 $ java -jar drivecopy.jar -f <local_file> replace <drive_file>
 ```
 
-Copyright and license
----------------------
+Author
+------
 
-Copyright 2012-2016 Luca Zanconato (<luca.zanconato@nharyes.net>)
+> GitHub [@gherynos](https://github.com/gherynos)
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this work except in compliance with the License.
-You may obtain a copy of the License in the LICENSE file, or at:
+License
+-------
 
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Drive Copy is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
