@@ -14,7 +14,6 @@
         <developer>
             <id>gherynos</id>
             <name>Luca Zanconato</name>
-            <email>luca.zanconato@nharyes.net</email>
         </developer>
     </developers>
 
@@ -24,12 +23,6 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-
-    <scm>
-        <url>${github.repository.url}</url>
-        <connection>${github.connection}</connection>
-        <developerConnection>${github.connection}</developerConnection>
-    </scm>
 
     <dependencies>
         <dependency>
@@ -71,7 +64,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>29.0-jre</version>
+            <version>[30.0-jre,)</version>
         </dependency>
     </dependencies>
 
