@@ -8,12 +8,13 @@
     <packaging>jar</packaging>
 
     <name>DriveCopy</name>
-    <url>https://github.com/gherynos/driveCopy</url>
+    <url>https://github.com/gherynos/drivecopy</url>
 
     <developers>
         <developer>
             <id>gherynos</id>
             <name>Luca Zanconato</name>
+            <url>https://gherynos.naes.co</url>
         </developer>
     </developers>
 

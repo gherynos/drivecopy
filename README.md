@@ -3,7 +3,7 @@ Drive Copy
 
 Drive Copy is a simple command line utility to download, replace and upload Google Drive binary files.
 
-[![Build Status](https://travis-ci.org/gherynos/drivecopy.svg?branch=master)](https://travis-ci.org/gherynos/drivecopy)
+![build](https://github.com/gherynos/drivecopy/workflows/build/badge.svg)
 
 Getting started
 ---------------
